@@ -19,13 +19,10 @@ public class RegisterServiceImpl implements RegisterService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
 
-    public RegisterServiceImpl(PasswordEncoder passwordEncoder, UserRepository userRepository, CustomerRepository customerRepository) {
+    public RegisterServiceImpl(PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.customerRepository = customerRepository;
     }
 
     @Override
