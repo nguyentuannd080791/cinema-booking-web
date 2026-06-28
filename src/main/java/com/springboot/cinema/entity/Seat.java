@@ -2,6 +2,8 @@ package com.springboot.cinema.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Seat {
     @Id
@@ -13,11 +15,15 @@ public class Seat {
     private String seatNumber;
 
     @Column(name = "seat_type")
+    @Enumerated(EnumType.STRING)
     private SeatType seatType;
 
     @ManyToOne
     @JoinColumn(name = "room_id", referencedColumnName = "room_id")
     private Room room;
+
+    @OneToMany(mappedBy = "seat")
+    private List<Ticket> ticketList;
 
     public Seat() {
     }
@@ -57,5 +63,13 @@ public class Seat {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public List<Ticket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
     }
 }

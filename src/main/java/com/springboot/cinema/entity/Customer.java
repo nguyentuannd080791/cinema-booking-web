@@ -3,6 +3,7 @@ package com.springboot.cinema.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Customer {
@@ -21,6 +22,9 @@ public class Customer {
     @MapsId
     @JoinColumn(name = "customer_id", referencedColumnName = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Booking> bookingList;
 
     public Customer() {
     }
@@ -59,5 +63,13 @@ public class Customer {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Booking> getBookingList() {
+        return bookingList;
+    }
+
+    public void setBookingList(List<Booking> bookingList) {
+        this.bookingList = bookingList;
     }
 }

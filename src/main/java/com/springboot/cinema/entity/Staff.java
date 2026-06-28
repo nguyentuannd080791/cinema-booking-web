@@ -2,6 +2,8 @@ package com.springboot.cinema.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Staff {
     @Id
@@ -16,6 +18,9 @@ public class Staff {
     @MapsId
     @JoinColumn(name = "staff_id", referencedColumnName = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "staff")
+    private List<Booking> bookingList;
 
     public Staff() {
     }
@@ -46,5 +51,13 @@ public class Staff {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Booking> getBookingList() {
+        return bookingList;
+    }
+
+    public void setBookingList(List<Booking> bookingList) {
+        this.bookingList = bookingList;
     }
 }

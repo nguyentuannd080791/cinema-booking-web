@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Showtime {
@@ -27,6 +28,9 @@ public class Showtime {
     @ManyToOne
     @JoinColumn(name = "room_id", referencedColumnName = "room_id")
     private Room room;
+
+    @OneToMany(mappedBy = "showtime")
+    private List<Ticket> ticketList;
 
     public Showtime() {
     }
@@ -83,5 +87,13 @@ public class Showtime {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public List<Ticket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
     }
 }

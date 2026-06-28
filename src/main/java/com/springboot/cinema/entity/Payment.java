@@ -2,6 +2,7 @@ package com.springboot.cinema.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,7 +14,7 @@ public class Payment {
 
     @Column(name = "payment_method")
     private String paymentMethod;
-    private int amount;
+    private BigDecimal amount;
 
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;
@@ -21,10 +22,14 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
+    @OneToOne
+    @JoinColumn(name = "booking_id", referencedColumnName = "booking_id")
+    private Booking booking;
+
     public Payment() {
     }
 
-    public Payment(String paymentMethod, int amount, LocalDateTime paymentTime, PaymentStatus status) {
+    public Payment(String paymentMethod, BigDecimal amount, LocalDateTime paymentTime, PaymentStatus status) {
         this.paymentMethod = paymentMethod;
         this.amount = amount;
         this.paymentTime = paymentTime;
@@ -47,11 +52,11 @@ public class Payment {
         this.paymentMethod = paymentMethod;
     }
 
-    public int getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -69,5 +74,13 @@ public class Payment {
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
     }
 }
