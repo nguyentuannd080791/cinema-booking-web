@@ -26,4 +26,9 @@ public class MovieServiceImpl implements MovieService {
 
         return movieRepository.findByCategoryName(categoryName, pageable);
     }
+
+    @Override
+    public Movie getMovieById(int movieId) {
+        return movieRepository.findById(movieId).orElse(null);
+    }
 }

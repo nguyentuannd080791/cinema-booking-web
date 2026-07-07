@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Details</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+  </head>
+  <body>
+    <div class="detail">
+      Information
+      <img th:src="${movie.posterURL}" class="img-fluid rounded-top" alt="" />
+      <div class="info">
+        <p>Tên phim: <span th:text="${movie.title}"></span></p>
+        <p>Ngày ra mắt: <span th:text="${movie.releaseDate}"></span></p>
+      </div>
+    </div>
+
+    <div class="showtime">
+        <div th:each="showtime : ${movie.showtimeList}">
+            <p th:text="${showtime.startTime}"></p>
+        </div>
+    </div>
+  </body>
+</html>
