@@ -2,6 +2,8 @@ package com.springboot.cinema.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(
         uniqueConstraints = @UniqueConstraint(
@@ -16,6 +18,8 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
+
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "showtime_id", referencedColumnName = "showtime_id")
@@ -32,8 +36,9 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(TicketStatus status) {
+    public Ticket(TicketStatus status, BigDecimal price) {
         this.status = status;
+        this.price = price;
     }
 
     public int getId() {
@@ -50,6 +55,14 @@ public class Ticket {
 
     public void setStatus(TicketStatus status) {
         this.status = status;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public Showtime getShowtime() {
