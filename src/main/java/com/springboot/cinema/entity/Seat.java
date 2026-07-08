@@ -14,6 +14,12 @@ public class Seat {
     @Column(name = "seat_number")
     private String seatNumber;
 
+    @Column(name = "row_index")
+    private int rowIndex;
+
+    @Column(name = "col_index")
+    private int colIndex;
+
     @Column(name = "seat_type")
     @Enumerated(EnumType.STRING)
     private SeatType seatType;
@@ -28,8 +34,10 @@ public class Seat {
     public Seat() {
     }
 
-    public Seat(String seatNumber, SeatType seatType) {
+    public Seat(String seatNumber, int rowIndex, int colIndex, SeatType seatType) {
         this.seatNumber = seatNumber;
+        this.rowIndex = rowIndex;
+        this.colIndex = colIndex;
         this.seatType = seatType;
     }
 
@@ -47,6 +55,22 @@ public class Seat {
 
     public void setSeatNumber(String seatNumber) {
         this.seatNumber = seatNumber;
+    }
+
+    public int getRowIndex() {
+        return rowIndex;
+    }
+
+    public void setRowIndex(int rowIndex) {
+        this.rowIndex = rowIndex;
+    }
+
+    public int getColIndex() {
+        return colIndex;
+    }
+
+    public void setColIndex(int colIndex) {
+        this.colIndex = colIndex;
     }
 
     public SeatType getSeatType() {

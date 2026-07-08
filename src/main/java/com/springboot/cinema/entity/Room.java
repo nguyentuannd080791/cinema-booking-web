@@ -13,7 +13,12 @@ public class Room {
 
     @Column(name = "room_name")
     private String roomName;
+
     private int capacity;
+
+    private int row;
+
+    private int col;
 
     @OneToMany(mappedBy = "room")
     private List<Seat> seatList;
@@ -24,9 +29,11 @@ public class Room {
     public Room() {
     }
 
-    public Room(String roomName, int capacity) {
+    public Room(String roomName, int capacity, int row, int col) {
         this.roomName = roomName;
         this.capacity = capacity;
+        this.row = row;
+        this.col = col;
     }
 
     public int getId() {
@@ -51,6 +58,22 @@ public class Room {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
     }
 
     public List<Seat> getSeatList() {
