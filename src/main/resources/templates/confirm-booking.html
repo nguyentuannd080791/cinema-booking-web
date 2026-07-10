@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+  </head>
+  <body>
+    <div class="container-fluid my-5">
+      <h3 class="text-center" th:text="${showtime.movie.title}"></h3>
+      <h3 class="text-center" th:text="${showtime.room.roomName}"></h3>
+      <h3 class="text-center" th:text="${showtime.startTime}"></h3>
+
+      <div th:each="seat : ${selectedSeatList}">
+        <span th:text="${seat.seatNumber}"></span>
+        <span th:text="${seat.rowIndex}"></span>
+        <span th:text="${seat.colIndex}"></span>
+        <span th:text="${seat.seatType}"></span>
+        <span th:text="${seat.price}"></span>
+      </div>
+
+      <div class="total" th:text="${totalPrice}"></div>
+    </div>
+  </body>
+</html>
