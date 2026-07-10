@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seat</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+  </head>
+  <body>
+    <div class="container-fluid pt-lg-5" style="width: 80rem">
+      <div class="table-responsive text-center">
+        <table class="table">
+          <thead class="table-secondary">
+            <tr>
+              <th scope="col">id</th>
+              <th scope="col">col</th>
+              <th scope="col">row</th>
+              <th scope="col">Seat Number</th>
+              <th scope="col">Seat Type</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="seat : ${seatList}">
+              <td scope="row" th:text="${seat.seatId}"></td>
+                <td scope="row" th:text="${seat.rowIndex}"></td>
+                <td scope="row" th:text="${seat.colIndex}"></td>
+                <td scope="row" th:text="${seat.seatNumber}"></td>
+                <td scope="row" th:text="${seat.seatType}"></td>
+                <td scope="row" th:text="${seat.ticketStatus}"></td>
+                <td scope="row" th:text="${seat.price}"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
