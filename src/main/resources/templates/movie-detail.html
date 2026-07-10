@@ -25,7 +25,7 @@
 
     <div class="showtime">
         <div th:each="showtime : ${movie.showtimeList}">
-            <p th:text="${showtime.startTime}"></p>
+            <a th:href="@{/showtime/{id}(id=${showtime.id})}" th:text="${showtime.startTime}"></a>
         </div>
     </div>
   </body>

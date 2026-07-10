@@ -5,7 +5,6 @@ import com.springboot.cinema.entity.Customer;
 import com.springboot.cinema.entity.Role;
 import com.springboot.cinema.entity.User;
 import com.springboot.cinema.entity.UserStatus;
-import com.springboot.cinema.repository.CustomerRepository;
 import com.springboot.cinema.repository.UserRepository;
 import com.springboot.cinema.service.RegisterService;
 import jakarta.transaction.Transactional;
@@ -35,7 +34,7 @@ public class RegisterServiceImpl implements RegisterService {
     public void registerUser(RegisterFormDTO registerFormDTO) {
         User user = new User(registerFormDTO.getEmail(),
                 passwordEncoder.encode(registerFormDTO.getHashPassword()),
-                registerFormDTO.getFullName(), registerFormDTO.getPhone(), Role.CUSTOMER, UserStatus.ACTIVED);
+                registerFormDTO.getFullName(), registerFormDTO.getPhone(), Role.CUSTOMER, UserStatus.ACTIVE);
 
         Customer customer = new Customer(0);
 
