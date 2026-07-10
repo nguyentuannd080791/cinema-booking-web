@@ -21,10 +21,10 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Page<Movie> getMovieList(String categoryName, int page, int size) {
+    public Page<Movie> getMovieList(String movieName, String categoryName, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        return movieRepository.findByCategoryName(categoryName, pageable);
+        return movieRepository.findByCategoryName(movieName, categoryName, pageable);
     }
 
     @Override

@@ -10,10 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MovieRepository extends CrudRepository<Movie, Integer> {
-    @Query("SELECT m FROM Movie m\n" +
-            "JOIN m.categoryList c\n" +
-            "WHERE (:name IS NULL OR c.categoryName LIKE :name)")
-    Page<Movie> findByCategoryName(@Param("name") String categoryName,
+    @Query("SELECT DISTINCT m FROM Movie m\n" +
+            "LEFT JOIN m.categoryList c\n" +
+            "WHERE (:movieName IS NULL OR m.title LIKE :movieName) \n" +
+            "AND (:categoryName IS NULL OR c.categoryName LIKE :categoryName)")
+    Page<Movie> findByCategoryName(@Param("movieName") String movieName,
+                                   @Param("categoryName") String categoryName,
                                    Pageable pageable);
 
 }

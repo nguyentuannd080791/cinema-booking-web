@@ -21,11 +21,12 @@ public class HomeController {
     @GetMapping("/home")
     public String home(HttpSession session,
                        Model model,
-                       @RequestParam(value = "category", required = false) String category,
+                       @RequestParam(value = "movie", required = false) String movieName,
+                       @RequestParam(value = "category", required = false) String categoryName,
                        @RequestParam(value = "page", required = false, defaultValue = "0") String page,
                        @RequestParam(value = "size", required = false, defaultValue = "10") String size )
     {
-        List<Movie> movieList = movieService.getMovieList(null, Integer.parseInt(page), Integer.parseInt(size)).getContent();
+        List<Movie> movieList = movieService.getMovieList(movieName, categoryName, Integer.parseInt(page), Integer.parseInt(size)).getContent();
         model.addAttribute("movieList", movieList);
         return "home";
     }
