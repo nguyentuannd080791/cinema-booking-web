@@ -7,8 +7,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ShowtimeController {
@@ -25,8 +29,20 @@ public class ShowtimeController {
         Integer showtimeId = Integer.parseInt(rawShowtimeId);
 
         List<SeatListDTO> seatList = seatService.getAllSeatByShowtimeId(showtimeId);
+        Map<Integer, List<SeatListDTO>> seatMap = seatList.stream().collect(Collectors.groupingBy(SeatListDTO :: getRowIndex));
 
         model.addAttribute("seatList", seatList);
+        model.addAttribute("seatMap", seatMap);
+        model.addAttribute("showtimeId", showtimeId);
         return "seat";
+    }
+
+    @PostMapping("/showtime/{id}")
+    public String getSeat(@PathVariable("id") String rawShowtimeId,
+                          @RequestParam("selectedSeatIds") List<Long> selectedSeatIds)
+    {
+        Integer showtimeId = Integer.parseInt(rawShowtimeId);
+
+        return "redirect:/home";
     }
 }
