@@ -1,11 +1,9 @@
 package com.springboot.cinema.controller;
 
 import com.springboot.cinema.dto.UserInformationDTO;
-import com.springboot.cinema.service.LoginService;
+import com.springboot.cinema.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,10 +11,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class LoginController {
-    private LoginService loginService;
+    private UserService userService;
 
-    public LoginController(LoginService loginService) {
-        this.loginService = loginService;
+    public LoginController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/login")
@@ -32,7 +30,7 @@ public class LoginController {
             RedirectAttributes redirectAttributes
     ) {
         System.out.println(email + "....." + password);
-        UserInformationDTO userInformationDTO = loginService.login(email, password);
+        UserInformationDTO userInformationDTO = userService.login(email, password);
 
         if(userInformationDTO == null){
             redirectAttributes.addFlashAttribute("error", "Email hoặc mật khẩu không đúng");

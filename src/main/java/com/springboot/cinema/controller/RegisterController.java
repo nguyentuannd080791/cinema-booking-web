@@ -1,10 +1,8 @@
 package com.springboot.cinema.controller;
 
 import com.springboot.cinema.dto.RegisterFormDTO;
-import com.springboot.cinema.service.RegisterService;
-import jakarta.servlet.http.HttpSession;
+import com.springboot.cinema.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class RegisterController {
-    private RegisterService registerService;
+    private UserService userService;
 
-    public RegisterController(RegisterService registerService) {
-        this.registerService = registerService;
+    public RegisterController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/register")
@@ -44,7 +42,7 @@ public class RegisterController {
             result.rejectValue("hashPassword", "error.hashPassword","Mật khẩu xác nhận không khớp");
         }
 
-        if(registerService.isEmailExists(registerFormDTO.getEmail())) {
+        if(userService.isEmailExists(registerFormDTO.getEmail())) {
             result.rejectValue("email", "error.email", "Email này đã tồn tại");
         }
 
@@ -53,7 +51,7 @@ public class RegisterController {
             return "register";
         }
 
-        registerService.registerUser(registerFormDTO);
+        userService.registerUser(registerFormDTO);
 
         return "redirect:/login";
     }

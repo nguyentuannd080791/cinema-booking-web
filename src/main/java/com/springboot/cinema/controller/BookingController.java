@@ -57,7 +57,7 @@ public class BookingController {
         List<Integer> selectedSeatIds = (List<Integer>) session.getAttribute("selectedSeatIds");
 
         bookingService.createBooking(user.getUserId(), showtimeId, selectedSeatIds);
-        return "home";
+        return "redirect:/home";
 
     }
 }
