@@ -41,6 +41,10 @@
         </div>
       </div>
 
+      <div class="text-center mb-3" th:if="${error}">
+        <small class="text-danger fw-bold" th:text="${error}"></small>
+      </div>
+
       <div
         class="seating-plan d-flex flex-column gap-2 align-items-center mb-4"
       >

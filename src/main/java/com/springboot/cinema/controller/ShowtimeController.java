@@ -52,14 +52,16 @@ public class ShowtimeController {
         if (user == null)
             return "redirect:/login";
 
-        Integer showtimeId = Integer.parseInt(rawShowtimeId);
-        Showtime showtime = showtimeService.getShowtimeById(showtimeId);
-        List<SeatListDTO> customerSeatList = seatService.getCustomerSeatList(showtimeId, selectedSeatIds);
-        Double totalPrice = seatService.caculateTotalPrice(showtimeId, selectedSeatIds);
+        if(selectedSeatIds.size() == 0)
+        {
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa chọn ghế nào");
+            return "redirect:/showtime/" + rawShowtimeId;
+        }
 
-        redirectAttributes.addFlashAttribute("showtime", showtime);
-        redirectAttributes.addFlashAttribute("selectedSeatList", customerSeatList);
-        redirectAttributes.addFlashAttribute("totalPrice", totalPrice);
+        Integer showtimeId = Integer.parseInt(rawShowtimeId);
+
+        session.setAttribute("showtimeId", showtimeId);
+        session.setAttribute("selectedSeatIds", selectedSeatIds);
 
         return "redirect:/confirm-booking";
     }
