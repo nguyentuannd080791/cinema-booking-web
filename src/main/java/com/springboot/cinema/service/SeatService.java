@@ -10,5 +10,5 @@ public interface SeatService {
 
     List<SeatListDTO> getCustomerSeatList(Integer showtimeId, List<Integer> selectedSeatIds);
 
-    Double caculateTotalPrice(Integer showtimeId, List<Integer> selectedSeatIds);
+    public Double caculateTotalPrice(Integer showtimeId, List<Integer> selectedSeatIds);
 }

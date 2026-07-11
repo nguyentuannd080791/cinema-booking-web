@@ -24,7 +24,7 @@ public class SeatServiceImpl implements SeatService {
         List<SeatListDTO> seatList = seatRepository.getSeatListByShowtimeId(showtimeId);
 
         for (SeatListDTO seat : seatList) {
-            caculateSeatCost(seat);
+            caculatedSeatCost(seat);
         }
 
         return seatList;
@@ -37,7 +37,7 @@ public class SeatServiceImpl implements SeatService {
 
         for (SeatListDTO seat : seatList) {
             if (selectedSeatIds.contains(seat.getSeatId())) {
-                caculateSeatCost(seat);
+                caculatedSeatCost(seat);
                 customerSeatList.add(seat);
             }
         }
@@ -52,7 +52,7 @@ public class SeatServiceImpl implements SeatService {
 
         for (SeatListDTO seat : seatList) {
             if (selectedSeatIds.contains(seat.getSeatId())) {
-                caculateSeatCost(seat);
+                caculatedSeatCost(seat);
 
                 totalPrice += seat.getPrice().doubleValue();
             }
@@ -61,11 +61,15 @@ public class SeatServiceImpl implements SeatService {
         return totalPrice;
     }
 
-    private void caculateSeatCost(SeatListDTO seat) {
-        Double cost = seat.getPrice().doubleValue();
-        if (seat.getSeatType() == SeatType.VIP) cost *= VIP_SEAT_COST_MULTIPLIER;
-        else if (seat.getSeatType() == SeatType.COUPLE) cost *= COUPLE_SEAT_COST_MULTIPLIER;
+    private void caculatedSeatCost(SeatListDTO seat) {
+        BigDecimal cost = seat.getPrice();
 
-        seat.setPrice(BigDecimal.valueOf(cost));
+        if (seat.getSeatType() == SeatType.VIP) {
+            cost = cost.multiply(BigDecimal.valueOf(VIP_SEAT_COST_MULTIPLIER));
+        } else if (seat.getSeatType() == SeatType.COUPLE) {
+            cost = cost.multiply(BigDecimal.valueOf(COUPLE_SEAT_COST_MULTIPLIER));
+        }
+
+        seat.setPrice(cost);
     }
 }

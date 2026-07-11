@@ -28,6 +28,14 @@
       </div>
 
       <div class="total" th:text="${totalPrice}"></div>
+
+      <a th:href="@{/movie/{id}(id=${showtime.id})}" class="btn btn-primary"
+        >Cancel</a
+      >
+
+      <form th:action="@{/confirm-booking}" method="post">
+        <button type="submit" class="btn btn-primary">Confirm</button>
+      </form>
     </div>
   </body>
 </html>
