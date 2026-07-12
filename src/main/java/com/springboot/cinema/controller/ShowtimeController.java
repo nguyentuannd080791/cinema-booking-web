@@ -2,6 +2,7 @@ package com.springboot.cinema.controller;
 
 import com.springboot.cinema.dto.SeatListDTO;
 import com.springboot.cinema.dto.UserInformationDTO;
+import com.springboot.cinema.entity.Role;
 import com.springboot.cinema.entity.Seat;
 import com.springboot.cinema.entity.Showtime;
 import com.springboot.cinema.service.SeatService;
@@ -35,11 +36,8 @@ public class ShowtimeController {
                           @PathVariable("id") String rawShowtimeId) {
         Integer showtimeId = Integer.parseInt(rawShowtimeId);
 
-        List<SeatListDTO> seatList = seatService.getAllSeatByShowtimeId(showtimeId);
-        Map<Integer, List<SeatListDTO>> seatMap = seatList.stream().collect(Collectors.groupingBy(SeatListDTO::getRowIndex));
+        getSeatMap(showtimeId, model);
 
-        model.addAttribute("seatMap", seatMap);
-        model.addAttribute("showtimeId", showtimeId);
         return "seat";
     }
 
@@ -64,5 +62,42 @@ public class ShowtimeController {
         session.setAttribute("selectedSeatIds", selectedSeatIds);
 
         return "redirect:/confirm-booking";
+    }
+
+    @GetMapping("/staff/showtime/{id}/check-in")
+    public String checkIn(HttpSession session,
+                          @PathVariable("id") String rawShowtimeId,
+                          Model model)
+    {
+        UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
+        if (user == null || user.getRole() != Role.STAFF)
+            return "redirect:/home";
+
+        Integer showtimeId = Integer.parseInt(rawShowtimeId);
+        getSeatMap(showtimeId, model);
+        return "checkin-seat";
+    }
+
+    @GetMapping("/staff/showtime/{id}/walk-in")
+    public String walkIn(HttpSession session,
+                         @PathVariable("id") String rawShowtimeId,
+                         Model model)
+    {
+        UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
+        if (user == null || user.getRole() != Role.STAFF)
+            return "redirect:/home";
+
+        Integer showtimeId = Integer.parseInt(rawShowtimeId);
+        getSeatMap(showtimeId, model);
+        return "walkin-seat";
+    }
+
+    private void getSeatMap(int showtimeId, Model model)
+    {
+        List<SeatListDTO> seatList = seatService.getAllSeatByShowtimeId(showtimeId);
+        Map<Integer, List<SeatListDTO>> seatMap = seatList.stream().collect(Collectors.groupingBy(SeatListDTO::getRowIndex));
+
+        model.addAttribute("seatMap", seatMap);
+        model.addAttribute("showtimeId", showtimeId);
     }
 }

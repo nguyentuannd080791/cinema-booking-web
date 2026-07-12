@@ -23,9 +23,16 @@
       </div>
     </div>
 
-    <div class="showtime">
+    <div th:if="${session.user == null || session.user?.role?.name() == 'CUSTOMER'}">
         <div th:each="showtime : ${movie.showtimeList}">
             <a th:href="@{/showtime/{id}(id=${showtime.id})}" th:text="${showtime.startTime}"></a>
+        </div>
+    </div>
+
+    <div th:if="${session.user?.role?.name() == 'STAFF'}">
+        <div th:each="showtime : ${movie.showtimeList}">
+            <p>Check in: <span><a th:href="@{/staff/showtime/{id}/check-in(id=${showtime.id})}" th:text="${showtime.startTime}"></a></span></p>
+            <p>Walk in: <span><a th:href="@{/staff/showtime/{id}/walk-in(id=${showtime.id})}" th:text="${showtime.startTime}"></a></span></p>
         </div>
     </div>
   </body>

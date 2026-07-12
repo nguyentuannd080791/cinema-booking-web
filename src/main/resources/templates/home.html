@@ -13,14 +13,18 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
   </head>
-  <body>
-    <h1>Welcome home</h1>
+  <body class="container">
+    <div class="d-flex justify-content-between align-items-center gap-4 my-5">
+      <h1 class="m-0">Welcome home</h1>
+
+      <div class="d-flex text-center fw-bold gap-2">
+        <a th:href="@{/login}" class="btn btn-primary">Login</a>
+        <a th:href="@{/register}" class="btn btn-secondary">Register</a>
+      </div>
+    </div>
 
     <div class="d-grid gap-2">
-      <a th:href="@{/login}" class="btn btn-primary"> Login </a>
-      <a th:href="@{/register}" class="btn btn-secondary"> Register </a>
-
-      <div class="row">
+      <div class="row g-3">
         <div class="col-4" th:each="movie : ${movieList}">
           <a
             th:href="@{/movie/{id}(id=${movie.id})}"
