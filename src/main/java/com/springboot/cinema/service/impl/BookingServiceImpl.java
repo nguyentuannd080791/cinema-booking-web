@@ -55,7 +55,13 @@ public class BookingServiceImpl implements BookingService {
         BigDecimal totalPrice = BigDecimal.valueOf(seatService.caculateTotalPrice(showtime.getId(), selectedSeatIds));
 
         Booking booking = new Booking(LocalDateTime.now(), BookingStatus.PENDING, totalPrice);
-        booking.setCustomer(user.getCustomer());
+
+        if(user.getRole() == Role.CUSTOMER) booking.setCustomer(user.getCustomer());
+        else if(user.getRole() == Role.STAFF) {
+            booking.setStaff(user.getStaff());
+            booking.setBookingStatus(BookingStatus.PAID);
+        }
+
         bookingRepository.save(booking);
 
         return booking;

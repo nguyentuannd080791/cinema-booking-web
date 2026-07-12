@@ -5,8 +5,10 @@ import com.springboot.cinema.dto.UserInformationDTO;
 import com.springboot.cinema.entity.Role;
 import com.springboot.cinema.entity.Seat;
 import com.springboot.cinema.entity.Showtime;
+import com.springboot.cinema.service.BookingService;
 import com.springboot.cinema.service.SeatService;
 import com.springboot.cinema.service.ShowtimeService;
+import com.springboot.cinema.service.TicketService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,10 +27,14 @@ import java.util.stream.Collectors;
 public class ShowtimeController {
     private SeatService seatService;
     private ShowtimeService showtimeService;
+    private TicketService ticketService;
+    private BookingService bookingService;
 
-    public ShowtimeController(SeatService seatService, ShowtimeService showtimeService) {
+    public ShowtimeController(SeatService seatService, ShowtimeService showtimeService, TicketService ticketService, BookingService bookingService) {
         this.seatService = seatService;
         this.showtimeService = showtimeService;
+        this.ticketService = ticketService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping("/showtime/{id}")
@@ -50,8 +56,7 @@ public class ShowtimeController {
         if (user == null)
             return "redirect:/login";
 
-        if(selectedSeatIds.size() == 0)
-        {
+        if (selectedSeatIds.size() == 0) {
             redirectAttributes.addFlashAttribute("error", "Bạn chưa chọn ghế nào");
             return "redirect:/showtime/" + rawShowtimeId;
         }
@@ -67,8 +72,7 @@ public class ShowtimeController {
     @GetMapping("/staff/showtime/{id}/check-in")
     public String checkIn(HttpSession session,
                           @PathVariable("id") String rawShowtimeId,
-                          Model model)
-    {
+                          Model model) {
         UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
         if (user == null || user.getRole() != Role.STAFF)
             return "redirect:/home";
@@ -78,11 +82,27 @@ public class ShowtimeController {
         return "checkin-seat";
     }
 
+    @PostMapping("/staff/showtime/{id}/check-in")
+    public String checkIn(HttpSession session,
+                          @PathVariable("id") String rawShowtimeId,
+                          @RequestParam("selectedSeatIds") List<Integer> selectedSeatIds,
+                          RedirectAttributes redirectAttributes) {
+        UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
+        if (user == null || user.getRole() != Role.STAFF)
+            return "redirect:/home";
+
+        Integer showtimeId = Integer.parseInt(rawShowtimeId);
+        ticketService.checkIn(showtimeId, selectedSeatIds);
+
+        redirectAttributes.addFlashAttribute("success", "Check in thành công");
+
+        return "redirect:/staff/showtime/" + showtimeId + "/check-in";
+    }
+
     @GetMapping("/staff/showtime/{id}/walk-in")
     public String walkIn(HttpSession session,
                          @PathVariable("id") String rawShowtimeId,
-                         Model model)
-    {
+                         Model model) {
         UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
         if (user == null || user.getRole() != Role.STAFF)
             return "redirect:/home";
@@ -92,8 +112,26 @@ public class ShowtimeController {
         return "walkin-seat";
     }
 
-    private void getSeatMap(int showtimeId, Model model)
+    @PostMapping("/staff/showtime/{id}/walk-in")
+    public String walkIn(HttpSession session,
+                         @PathVariable("id") String rawShowtimeId,
+                         @RequestParam("selectedSeatIds") List<Integer> selectedSeatIds,
+                         RedirectAttributes redirectAttributes)
     {
+        UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
+        if (user == null || user.getRole() != Role.STAFF)
+            return "redirect:/home";
+
+        Integer showtimeId = Integer.parseInt(rawShowtimeId);
+
+        bookingService.createBooking(user.getUserId(), showtimeId, selectedSeatIds);
+
+        redirectAttributes.addFlashAttribute("success", "Tạo vé thành công");
+
+        return "redirect:/staff/showtime/" + showtimeId + "/walk-in";
+    }
+
+    private void getSeatMap(int showtimeId, Model model) {
         List<SeatListDTO> seatList = seatService.getAllSeatByShowtimeId(showtimeId);
         Map<Integer, List<SeatListDTO>> seatMap = seatList.stream().collect(Collectors.groupingBy(SeatListDTO::getRowIndex));
 
