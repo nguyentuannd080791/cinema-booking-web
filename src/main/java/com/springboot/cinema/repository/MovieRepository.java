@@ -12,8 +12,9 @@ import org.springframework.stereotype.Repository;
 public interface MovieRepository extends CrudRepository<Movie, Integer> {
     @Query("SELECT DISTINCT m FROM Movie m\n" +
             "LEFT JOIN m.categoryList c\n" +
-            "WHERE (:movieName IS NULL OR m.title LIKE :movieName) \n" +
-            "AND (:categoryName IS NULL OR c.categoryName LIKE :categoryName)")
+            "WHERE (:movieName IS NULL OR m.title LIKE %:movieName%) \n" +
+            "AND (:categoryName IS NULL OR c.categoryName = :categoryName) \n" +
+            "AND (m.status <> 'NOLONGERSHOWING')")
     Page<Movie> findByCategoryName(@Param("movieName") String movieName,
                                    @Param("categoryName") String categoryName,
                                    Pageable pageable);

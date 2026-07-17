@@ -41,4 +41,11 @@ public class LoginController {
         session.setAttribute("user", userInformationDTO);
         return "redirect:/home";
     }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session)
+    {
+        session.invalidate();
+        return "redirect:/home";
+    }
 }

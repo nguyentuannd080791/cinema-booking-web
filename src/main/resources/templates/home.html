@@ -17,10 +17,49 @@
     <div class="d-flex justify-content-between align-items-center gap-4 my-5">
       <h1 class="m-0">Welcome home</h1>
 
-      <div class="d-flex text-center fw-bold gap-2">
-        <a th:href="@{/login}" class="btn btn-primary">Login</a>
-        <a th:href="@{/register}" class="btn btn-secondary">Register</a>
+      <div>
+        <span th:if="${user == null}">
+          <div class="d-flex text-center fw-bold gap-2">
+            <a th:href="@{/login}" class="btn btn-primary">Login</a>
+            <a th:href="@{/register}" class="btn btn-secondary">Register</a>
+          </div>
+        </span>
+        <span th:unless="${user == null}">
+          <div
+            class="d-flex flex-row align-items-center text-center fw-bold gap-2"
+          >
+            <p th:text="${user.fullName}"></p>
+            <a th:href="@{/logout}" class="btn btn-secondary">Logout</a>
+          </div>
+        </span>
       </div>
+    </div>
+
+    <div class="d-flex flex-column g-3 mb-4">
+      <form th:action="@{/home}" method="get">
+        <input
+          type="text"
+          name="movie"
+          th:value="${movieSearch}"
+          class="form-control"
+          placeholder="Tìm kiếm phim... "
+        />
+
+        <select
+          class="form-select"
+          name="category"
+          id=""
+          onchange="this.form.submit()"
+        >
+          <option value="">Tất cả thể loại</option>
+          <option
+            th:each="category : ${categoryList}"
+            th:value="${category.categoryName}"
+            th:text="${category.categoryName}"
+            th:selected="${category.categoryName == categorySelected}"
+          ></option>
+        </select>
+      </form>
     </div>
 
     <div class="d-grid gap-2">
@@ -45,6 +84,51 @@
           </a>
         </div>
       </div>
+    </div>
+
+    <div>
+      <nav class="d-flex justify-content-center mb-5">
+        <ul class="pagination pagination-custom gap-2">
+          <li class="page-item" th:classappend="${moviePage.first}? 'disabled'">
+            <a
+              class="page-link"
+              th:href="@{/home(movie=${movieSearch}, category=${selectedCategory}, page=${moviePage.number-1})}"
+              tabindex="-1"
+              >Trước</a
+            >
+          </li>
+          <li class="page-item disabled" th:if="${startPage > 0}">
+            <span class="page-link">...</span>
+          </li>
+          <li
+            class="page-item"
+            th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+            th:classappend="${pageNumber == moviePage.number}? 'active'"
+          >
+            <a
+              th:href="@{/home(movie=${movieSearch}, category=${selectedCategory}, page=${pageNumber})}"
+              class="page-link"
+              th:text="${pageNumber + 1}"
+            ></a>
+          </li>
+
+          <li
+            class="page-item disabled"
+            th:if="${endPage < moviePage.totalPages - 1}"
+          >
+            <span class="page-link">...</span>
+          </li>
+
+          <li class="page-item" th:classappend="${moviePage.last}? 'disabled'">
+            <a
+              class="page-link"
+              th:href="@{/home(movie=${movieSearch}, category=${selectedCategory}, page=${moviePage.number-1})}"
+              tabindex="+1"
+              >Sau</a
+            >
+          </li>
+        </ul>
+      </nav>
     </div>
   </body>
 </html>
