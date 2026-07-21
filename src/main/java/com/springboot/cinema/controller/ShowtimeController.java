@@ -48,7 +48,12 @@ public class ShowtimeController {
 
     @GetMapping("/showtime/{id}")
     public String getSeat(Model model,
-                          @PathVariable("id") String rawShowtimeId) {
+                          @PathVariable("id") String rawShowtimeId,
+                          HttpSession session) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
+
         Integer showtimeId = parseIdOrNull(rawShowtimeId);
         if (showtimeId == null) {
             return "redirect:/home";
@@ -194,8 +199,7 @@ public class ShowtimeController {
     public String walkIn(HttpSession session,
                          @PathVariable("id") String rawShowtimeId,
                          @RequestParam("selectedSeatIds") List<Integer> selectedSeatIds,
-                         RedirectAttributes redirectAttributes)
-    {
+                         RedirectAttributes redirectAttributes) {
         if (isNotStaff(session))
             return "redirect:/home";
 
@@ -231,7 +235,7 @@ public class ShowtimeController {
                     return seatNum.substring(0, i);
                 }
             }
-            return String.valueOf((char)('A' + seat.getRowIndex() - 1));
+            return String.valueOf((char) ('A' + seat.getRowIndex() - 1));
         }, TreeMap::new, Collectors.toList()));
 
         model.addAttribute("seatMap", seatMap);
