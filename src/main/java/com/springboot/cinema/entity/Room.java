@@ -3,6 +3,7 @@ package com.springboot.cinema.entity;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Room {
@@ -90,5 +91,18 @@ public class Room {
 
     public void setShowtimeList(List<Showtime> showtimeList) {
         this.showtimeList = showtimeList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Room)) return false;
+        Room room = (Room) o;
+        return id == room.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

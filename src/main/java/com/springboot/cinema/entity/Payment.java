@@ -22,8 +22,11 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
+    @Column(name = "transaction_reference", nullable = false, unique = true, updatable = false)
+    private String transactionReference;
+
     @OneToOne
-    @JoinColumn(name = "booking_id", referencedColumnName = "booking_id")
+    @JoinColumn(name = "booking_id", referencedColumnName = "booking_id", unique = true)
     private Booking booking;
 
     public Payment() {
@@ -82,5 +85,13 @@ public class Payment {
 
     public void setBooking(Booking booking) {
         this.booking = booking;
+    }
+
+    public String getTransactionReference() {
+        return transactionReference;
+    }
+
+    public void setTransactionReference(String transactionReference) {
+        this.transactionReference = transactionReference;
     }
 }

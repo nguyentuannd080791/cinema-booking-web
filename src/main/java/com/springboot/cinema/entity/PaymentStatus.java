@@ -1,5 +1,5 @@
 package com.springboot.cinema.entity;
 
 public enum PaymentStatus {
-    PENDING, SUCCESS, FAILED
+    PENDING, SUCCESS, FAILED, CANCELLED
 }
