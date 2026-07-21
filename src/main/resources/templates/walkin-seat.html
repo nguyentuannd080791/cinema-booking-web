@@ -1,50 +1,215 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Seat</title>
+    <title>CineMax - Bán Vé Tại Quầy (Walk-In)</title>
+    <!-- Bootstrap CSS -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+      body {
+        background-color: #0f0f0f;
+      }
+      .pos-wrapper {
+        min-height: calc(100vh - 70px);
+      }
+      .pos-seating-area {
+        overflow-y: auto;
+        padding: 2rem;
+      }
+      .pos-sidebar {
+        background-color: #161616;
+        border-left: 2px solid #222;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2rem;
+      }
+      .seat-btn.selected-walkin {
+        background-color: var(--accent, #E50914) !important;
+        border-color: var(--accent, #E50914) !important;
+        color: white !important;
+        transform: scale(1.1);
+      }
+    </style>
   </head>
   <body>
-    <div class="container-fluid pt-lg-5 my-5" style="width: 80rem">
-      <h3 class="text-center mb-4">Tạo vé mới</h3>
+    <!-- Walk-in Header Navbar -->
+    <nav class="navbar-cinemax" style="border-bottom: 2px solid var(--success, #2ec4b6) !important;">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <a class="nav-brand me-4" th:href="@{/home}">
+            <i class="bi bi-cpu-fill text-success"></i>CINE<span>MAX</span> <small class="text-success fs-6 font-title ms-2">POS</small>
+          </a>
+          <span class="badge bg-success text-white font-title px-3 py-1 ms-2" style="font-size: 12px;">WALK-IN MODE</span>
+        </div>
+        <div class="nav-actions">
+          <a th:href="@{/movie/{id}(id=${showtime.movie.id})}" class="btn-nav-ghost"><i class="bi bi-box-arrow-left me-1"></i>Thoát</a>
+        </div>
+      </div>
+    </nav>
 
-      <div
-        th:replace="~{components/seat-ui :: cinemaSeat(seatMap=${seatMap}, mode = 'STAFF_WALKIN')}"
-      ></div>
+    <!-- Main POS Layout -->
+    <div class="container-fluid px-0">
+      <!-- Alerts -->
+      <div class="container pt-3">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-2" role="alert">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          <span th:text="${success}">Thành công</span>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show bg-dark border-danger text-danger mb-2" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <span th:text="${error}">Lỗi</span>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <div class="row g-0 pos-wrapper">
+        <!-- Left: Seating Area -->
+        <div class="col-md-8 pos-seating-area">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="font-title mb-0 border-start border-success border-4 ps-3 text-white">Sơ đồ chọn ghế</h4>
+            <span class="text-muted-custom">Chọn trực tiếp ghế trống cho khách vãng lai</span>
+          </div>
+
+          <!-- Screen visual -->
+          <div class="screen-container text-center mb-5">
+            <div class="screen-visual" style="background: rgba(46, 204, 113, 0.1);">MÀN HÌNH CHÍNH</div>
+          </div>
+
+          <!-- Seating matrix -->
+          <div class="overflow-auto pb-4">
+            <div class="seating-matrix" style="min-width: 600px;">
+              <div class="seat-row" th:each="entry : ${seatMap}">
+                <span class="seat-label" th:text="${entry.key}">A</span>
+                
+                <th:block th:each="seat : ${entry.value}">
+                  <!-- Sold Seat -->
+                  <button th:if="${seat.ticketStatus != null}" 
+                          class="seat-btn sold" 
+                          th:text="${seat.seatNumber}">3</button>
+                          
+                  <!-- Available Seat -->
+                  <button th:unless="${seat.ticketStatus != null}" 
+                          class="seat-btn" 
+                          th:classappend="${seat.seatType.name() == 'VIP'} ? 'border-warning text-warning' : (${seat.seatType.name() == 'COUPLE'} ? 'couple' : '')"
+                          th:data-id="${seat.seatId}"
+                          th:data-number="${seat.seatNumber}"
+                          th:data-price="${seat.price}"
+                          onclick="selectWalkin(this)"
+                          th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">1</button>
+                </th:block>
+                
+                <span class="seat-label" th:text="${entry.key}">A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Checkout side bar POS -->
+        <div class="col-md-4 pos-sidebar">
+          <div>
+            <h4 class="font-title border-start border-success border-4 ps-3 text-success mb-4">Chi Tiết Đơn Hàng</h4>
+            
+            <div class="mb-3">
+              <label class="text-white-50 fs-6">Phim:</label>
+              <h5 class="text-white font-title mb-0" th:text="${showtime.movie.title}">Avatar: Dòng Chảy Của Nước</h5>
+            </div>
+            
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="text-white-50">Phòng:</label>
+                <span class="text-white font-title d-block" th:text="${showtime.room.roomName}">Hall 1</span>
+              </div>
+              <div class="col-6">
+                <label class="text-white-50">Lịch Chiếu:</label>
+                <span class="text-white font-title d-block" th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">19:00</span>
+              </div>
+            </div>
+
+            <hr class="border-secondary my-3" />
+
+            <div class="mb-4">
+              <label class="text-white-50 mb-2">Ghế đang chọn (real-time):</label>
+              <div id="selected-list" class="bg-dark p-3 rounded" style="min-height: 80px; max-height: 200px; overflow-y: auto;">
+                <p class="text-muted-custom mb-0 italic">Click vào ghế để thêm vào giỏ</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-white-50 font-title fs-5">TỔNG TIỀN:</span>
+              <span class="text-success font-title h2 mb-0" id="pos-total">0 đ</span>
+            </div>
+
+            <div class="d-grid gap-2">
+              <form th:action="@{/staff/showtime/{id}/walk-in(id=${showtimeId})}" method="post" id="walkinForm">
+                <input type="hidden" name="selectedSeatIds" id="selectedSeatIdsInput" />
+                <button type="submit" class="btn btn-success btn-lg py-3 font-title text-white text-uppercase w-100" id="checkout-btn" disabled style="background-color: #2ECC71 !important; border-color: #2ECC71 !important;">
+                  <i class="bi bi-printer-fill me-2"></i>Tạo Vé Vãng Lai
+                </button>
+              </form>
+              <a th:href="@{/movie/{id}(id=${showtime.movie.id})}" class="btn btn-outline-secondary py-2 text-white-50 w-100 mt-2">Hủy bỏ</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      function toggleSeat(seat) {
-        if (seat.classList.contains("disabled")) return;
+      let walkinSeats = [];
 
-        if (seat.classList.contains("btn-outline-secondary")) {
-          seat.classList.remove("btn-outline-secondary");
-          seat.classList.add("btn-success", "selected");
+      function selectWalkin(btn) {
+        btn.classList.toggle('selected-walkin');
+        const seatId = btn.getAttribute('data-id');
+        const seatNumber = btn.getAttribute('data-number');
+        const price = parseFloat(btn.getAttribute('data-price'));
+
+        if (btn.classList.contains('selected-walkin')) {
+          walkinSeats.push({ id: seatId, number: seatNumber, price: price });
         } else {
-          seat.classList.remove("btn-success", "selected");
-          seat.classList.add("btn-outline-secondary");
+          walkinSeats = walkinSeats.filter(seat => seat.id !== seatId);
         }
+
+        updatePOS();
       }
 
-      function getSelectedSeats() {
-        const selectedSeat = document.querySelectorAll(".seat-item.selected");
-        const inputHidden = document.getElementById("selectedSeatIdsInput");
-        const selectedIds = Array.from(selectedSeat).map((seat) =>
-          seat.getAttribute("data-id"),
-        );
+      function updatePOS() {
+        const listDiv = document.getElementById('selected-list');
+        const totalSpan = document.getElementById('pos-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const input = document.getElementById('selectedSeatIdsInput');
 
-        inputHidden.value = selectedIds.join(",");
-
-        console.log("Các ID ghế đã chọn:", selectedIds);
+        if (walkinSeats.length === 0) {
+          listDiv.innerHTML = '<p class="text-muted-custom mb-0 italic">Click vào ghế để thêm vào giỏ</p>';
+          totalSpan.textContent = "0 đ";
+          checkoutBtn.disabled = true;
+          input.value = "";
+        } else {
+          let listHtml = '<table class="table table-dark table-borderless table-sm mb-0"><tbody>';
+          let sum = 0;
+          walkinSeats.forEach(seat => {
+            sum += seat.price;
+            listHtml += `<tr><td>Ghế ${seat.number}</td><td class="text-end text-success">${seat.price.toLocaleString('vi-VN')} đ</td></tr>`;
+          });
+          listHtml += '</tbody></table>';
+          listDiv.innerHTML = listHtml;
+          totalSpan.textContent = sum.toLocaleString('vi-VN') + " đ";
+          checkoutBtn.disabled = false;
+          input.value = walkinSeats.map(seat => seat.id).join(',');
+        }
       }
     </script>
   </body>

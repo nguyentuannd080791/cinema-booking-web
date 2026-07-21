@@ -1,160 +1,138 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <body>
-    <div th:fragment="cinemaSeat(seatMap, mode)">
-      <div class="d-flex justify-content-center gap-4 mb-4">
-        <div class="d-flex align-items-center gap-2">
-          <div
-            class="btn btn-outline-secondary disabled"
-            style="width: 24px; height: 24px; padding: 0"
-          ></div>
-          <span>Ghế trống</span>
-        </div>
 
-        <div
-          th:if="${mode == 'CUSTOMER' or mode == 'STAFF_WALKIN'}"
-          class="d-flex align-items-center gap-2"
-        >
-          <div
-            class="btn btn-success disabled"
-            style="width: 24px; height: 24px; padding: 0"
-          ></div>
-          <span>Ghế đang chọn</span>
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-          <div
-            class="btn btn-danger disabled"
-            style="width: 24px; height: 24px; padding: 0"
-          ></div>
-          <span
-            th:text="${mode == 'STAFF_CHECKIN' ? 'Cần check-in' : 'Đã bán/Khóa'}"
-            >Đã bán</span
-          >
-        </div>
-
-        <div
-          th:if="${mode.startsWith('STAFF')}"
-          class="d-flex align-items-center gap-2"
-        >
-          <div
-            class="btn btn-secondary disabled"
-            style="width: 24px; height: 24px; padding: 0"
-          ></div>
-          <span>Đã check-in</span>
-        </div>
+<body>
+  <div th:fragment="cinemaSeat(seatMap, mode)">
+    <div class="d-flex justify-content-center gap-4 mb-4">
+      <div class="d-flex align-items-center gap-2">
+        <div class="btn btn-outline-secondary disabled" style="width: 24px; height: 24px; padding: 0"></div>
+        <span>Ghế trống</span>
       </div>
 
-      <div
-        class="seating-plan d-flex flex-column gap-2 align-items-center mb-4"
-      >
-        <div
-          class="seat-row d-flex align-items-center gap-2"
-          th:each="entry : ${seatMap}"
-        >
-          <span
-            class="row-label fw-bold me-2"
-            style="width: 4rem"
-            th:text="'Hàng ' + ${entry.key}"
-          ></span>
-
-          <button
-            type="button"
-            style="width: 40px; height: 40px; font-size: 14px"
-            class="btn p-0 d-flex align-items-center justify-content-center seat-item"
-            th:each="seat : ${entry.value}"
-            th:classappend="${seat.ticketStatus == null ? 
-              (mode == 'STAFF_CHECKIN' ? 'btn-light text-muted disabled' : 'btn-outline-secondary') : 
-              (seat.ticketStatus.name() == 'VALID' && mode == 'STAFF_CHECKIN' ? 
-                    'btn-outline-secondary' : 'btn-danger disabled')}"
-            th:data-id="${seat.seatId}"
-            th:data-number="${seat.seatNumber}"
-            th:text="${seat.seatNumber}"
-            th:onclick="toggleSeat(this)"
-          ></button>
-        </div>
+      <div th:if="${mode == 'CUSTOMER' or mode == 'STAFF_WALKIN'}" class="d-flex align-items-center gap-2">
+        <div class="btn btn-success disabled" style="width: 24px; height: 24px; padding: 0"></div>
+        <span>Ghế đang chọn</span>
       </div>
 
-      <div th:if="${mode == 'CUSTOMER'}">
-        <form
-          th:action="@{/showtime/{id}(id=${showtimeId})}"
-          method="post"
-          onsubmit="getSelectedSeats()"
-        >
-          <input
-            type="hidden"
-            name="selectedSeatIds"
-            id="selectedSeatIdsInput"
-          />
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-lg px-5">
-              Xác nhận chọn ghế
-            </button>
-          </div>
-        </form>
+      <div class="d-flex align-items-center gap-2">
+        <div class="btn btn-danger disabled" style="width: 24px; height: 24px; padding: 0"></div>
+        <span th:text="${mode == 'STAFF_CHECKIN' ? 'Cần check-in' : 'Đã bán/Khóa'}">Đã bán</span>
       </div>
 
-      <div th:if="${mode == 'STAFF_CHECKIN'}">
-        <form
-          th:action="@{/staff/showtime/{id}/check-in(id=${showtimeId})}"
-          method="post"
-          onsubmit="getSelectedSeats()"
-        >
-          <input
-            type="hidden"
-            name="selectedSeatIds"
-            id="selectedSeatIdsInput"
-          />
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-lg px-5">
-             Check in ghế
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div th:if="${mode == 'STAFF_WALKIN'}">
-        <form
-          th:action="@{/staff/showtime/{id}/walk-in(id=${showtimeId})}"
-          method="post"
-          onsubmit="getSelectedSeats()"
-        >
-          <input
-            type="hidden"
-            name="selectedSeatIds"
-            id="selectedSeatIdsInput"
-          />
-          <div class="text-center">
-            <button type="submit" class="btn btn-warning btn-lg px-5">
-              Tạo vé vãng lai
-            </button>
-          </div>
-        </form>
+      <div th:if="${mode.startsWith('STAFF')}" class="d-flex align-items-center gap-2">
+        <div class="btn btn-secondary disabled" style="width: 24px; height: 24px; padding: 0"></div>
+        <span>Đã check-in</span>
       </div>
     </div>
 
-    <script>
-      function toggleSeat(seat) {
-        if (seat.classList.contains("disabled")) return;
+    <div class="seating-plan d-flex flex-column gap-2 align-items-center mb-4">
+      <div class="seat-row d-flex align-items-center gap-2" th:each="entry : ${seatMap}">
+        <span class="row-label fw-bold me-2" style="width: 4rem" th:text="'Hàng ' + ${entry.key}"></span>
 
-        if (seat.classList.contains("btn-outline-secondary")) {
-          seat.classList.remove("btn-outline-secondary");
-          seat.classList.add("btn-success", "selected");
-        } else {
-          seat.classList.remove("btn-success", "selected");
-          seat.classList.add("btn-outline-secondary");
-        }
+        <button type="button" style="width: 40px; height: 40px; font-size: 14px"
+          class="btn p-0 d-flex align-items-center justify-content-center seat-item" th:each="seat : ${entry.value}"
+          th:classappend="${seat.ticketStatus == null ? 
+              (mode == 'STAFF_CHECKIN' ? 'btn-light text-muted disabled' : 'btn-outline-secondary') : 
+              (seat.ticketStatus.name() == 'VALID' && mode == 'STAFF_CHECKIN' ? 
+                    'btn-outline-secondary' : 'btn-danger disabled')}" th:data-id="${seat.seatId}"
+          th:data-number="${seat.seatNumber}" th:text="${seat.seatNumber}" th:onclick="toggleSeat(this)"></button>
+      </div>
+    </div>
+
+    <div th:if="${mode == 'CUSTOMER'}">
+      <form th:action="@{/showtime/{id}(id=${showtimeId})}" method="post" onsubmit="getSelectedSeats()">
+        <input type="hidden" name="selectedSeatIds" id="selectedSeatIdsInput" />
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-lg px-5">
+            Xác nhận chọn ghế
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div th:if="${mode == 'STAFF_CHECKIN'}">
+      <form th:action="@{/staff/showtime/{id}/check-in(id=${showtimeId})}" method="post" onsubmit="getSelectedSeats()">
+        <input type="hidden" name="selectedSeatIds" id="selectedSeatIdsInput" />
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-lg px-5">
+            Check in ghế
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div th:if="${mode == 'STAFF_WALKIN'}">
+      <form th:action="@{/staff/showtime/{id}/walk-in(id=${showtimeId})}" method="post" onsubmit="getSelectedSeats()">
+        <input type="hidden" name="selectedSeatIds" id="selectedSeatIdsInput" />
+        <div class="text-center">
+          <button type="submit" class="btn btn-warning btn-lg px-5">
+            Tạo vé vãng lai
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function toggleSeat(seat) {
+      if (seat.classList.contains("disabled")) return;
+
+      if (seat.classList.contains("btn-outline-secondary")) {
+        seat.classList.remove("btn-outline-secondary");
+        seat.classList.add("btn-success", "selected");
+      } else {
+        seat.classList.remove("btn-success", "selected");
+        seat.classList.add("btn-outline-secondary");
       }
+    }
 
-      function getSelectedSeats() {
-        const selectedSeat = document.querySelectorAll(".seat-item.selected");
-        const inputHidden = document.getElementById("selectedSeatIdsInput");
-        const selectedIds = Array.from(selectedSeat).map((seat) =>
-          seat.getAttribute("data-id"),
-        );
+    function getSelectedSeats() {
+      const selectedSeat = document.querySelectorAll(".seat-item.selected");
+      const inputHidden = document.getElementById("selectedSeatIdsInput");
+      const selectedIds = Array.from(selectedSeat).map((seat) =>
+        seat.getAttribute("data-id"),
+      );
 
-        inputHidden.value = selectedIds.join(",");
-      }
-    </script>
-  </body>
+      inputHidden.value = selectedIds.join(",");
+    }
+  </script>
+</body>
+
+</html>
+selectedWalkinSeats = selectedWalkinSeats.filter(s => s.id !== seatId);
+}
+
+const listDiv = document.getElementById('selected-list');
+const totalSpan = document.getElementById('pos-total');
+const checkoutBtn = document.getElementById('checkout-btn');
+const inputHidden = document.getElementById('selectedSeatIdsInput');
+
+if (selectedWalkinSeats.length === 0) {
+listDiv.innerHTML = '<p class="text-muted-custom mb-0 italic">Click vào ghế để thêm vào giỏ</p>';
+totalSpan.textContent = "0 đ";
+checkoutBtn.disabled = true;
+inputHidden.value = "";
+} else {
+let listHtml = '<table class="table table-dark table-borderless table-sm mb-0">
+  <tbody>';
+    let sum = 0;
+    selectedWalkinSeats.forEach(seat => {
+    sum += seat.price;
+    listHtml += `<tr>
+      <td>Ghế ${seat.number} ${seat.vip ? '(VIP)' : ''}</td>
+      <td class="text-end text-success">${seat.price.toLocaleString('vi-VN')} đ</td>
+    </tr>`;
+    });
+    listHtml += '</tbody>
+</table>';
+listDiv.innerHTML = listHtml;
+totalSpan.textContent = sum.toLocaleString('vi-VN') + " đ";
+checkoutBtn.disabled = false;
+inputHidden.value = selectedWalkinSeats.map(s => s.id).join(',');
+}
+}
+</script>
+</div>
+</body>
+
 </html>

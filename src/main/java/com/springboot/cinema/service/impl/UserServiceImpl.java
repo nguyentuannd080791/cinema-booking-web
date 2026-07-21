@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email);
 
         if (user == null || !passwordEncoder.matches(password, user.getHashPassword())) return null;
+        if (user.getStatus() != UserStatus.ACTIVE) return null;
 
         return new UserInformationDTO(user.getId(), user.getFullName(), user.getRole());
     }

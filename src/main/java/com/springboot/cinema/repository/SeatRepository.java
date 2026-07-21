@@ -18,4 +18,10 @@ public interface SeatRepository extends CrudRepository<Seat, Integer> {
             "LEFT JOIN Ticket t ON t.seat.id = s.id AND t.showtime.id = sh.id\n" +
             "WHERE sh.id = :showtimeId")
     List<SeatListDTO> getSeatListByShowtimeId(@Param("showtimeId") int showtimeId);
+
+    @Query("SELECT s FROM Seat s WHERE s.room.id = :roomId ORDER BY s.rowIndex ASC, s.colIndex ASC")
+    List<Seat> findByRoomId(@Param("roomId") int roomId);
+
+    @Query("SELECT s FROM Seat s WHERE s.room.id = :roomId AND s.id IN :seatIds")
+    List<Seat> findByRoomIdAndIdIn(@Param("roomId") int roomId, @Param("seatIds") List<Integer> seatIds);
 }

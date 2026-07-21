@@ -1,50 +1,199 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Seat</title>
+    <title>CineMax - Check-In Vé (Nhân viên)</title>
+    <!-- Bootstrap CSS -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+      body {
+        background-color: var(--bg-primary, #111215);
+      }
+      .staff-action-card {
+        background-color: var(--bg-card, #17181c);
+        border: 1px solid var(--border, rgba(255,255,255,0.08));
+        border-radius: 8px;
+        padding: 1.5rem;
+      }
+    </style>
   </head>
   <body>
-    <div class="container-fluid pt-lg-5 my-5" style="width: 80rem">
-      <h3 class="text-center mb-4">Check in khách</h3>
+    <!-- Staff Header Navbar -->
+    <nav class="navbar-cinemax" style="border-bottom: 2px solid var(--warning, #ffc107) !important;">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <a class="nav-brand me-4" th:href="@{/home}">
+            <i class="bi bi-shield-lock-fill text-warning"></i>CINE<span>MAX</span> <small class="text-warning fs-6 font-title ms-2">STAFF</small>
+          </a>
+          <span class="badge bg-warning text-dark font-title px-3 py-1 ms-2" style="font-size: 12px;">CHECK-IN MODE</span>
+        </div>
+        <div class="nav-actions">
+          <a th:href="@{/movie/{id}(id=${showtime.movie.id})}" class="btn-nav-ghost"><i class="bi bi-box-arrow-left me-1"></i>Thoát</a>
+        </div>
+      </div>
+    </nav>
 
-      <div
-        th:replace="~{components/seat-ui :: cinemaSeat(seatMap=${seatMap}, mode = 'STAFF_CHECKIN')}"
-      ></div>
+    <div class="container my-5">
+      <!-- Alerts -->
+      <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${success}">Thành công</span>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show bg-dark border-danger text-danger mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span th:text="${error}">Lỗi</span>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
+      <div class="row g-4">
+        <!-- Main Seating Plan -->
+        <div class="col-lg-8">
+          <div class="card p-4 h-100 bg-transparent border-0">
+            <h4 class="font-title mb-4 border-start border-warning border-4 ps-3 text-warning">Sơ Đồ Soát Vé Suất Chiếu</h4>
+            
+            <div class="screen-container text-center mb-5">
+              <div class="screen-visual" style="background: rgba(255, 215, 0, 0.1);">MÀN HÌNH CHIẾU</div>
+            </div>
+
+            <!-- Seating matrix -->
+            <div class="overflow-auto pb-3">
+              <div class="seating-matrix" style="min-width: 600px;">
+                <div class="seat-row" th:each="entry : ${seatMap}">
+                  <span class="seat-label" th:text="${entry.key}">A</span>
+                  
+                  <th:block th:each="seat : ${entry.value}">
+                    <!-- Ghế chưa bán (Không có vé) -->
+                    <button th:if="${seat.ticketStatus == null}" 
+                            class="seat-btn disabled-staff" 
+                            disabled 
+                            th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">1</button>
+                            
+                    <!-- Vé đã check-in thành công (status == USED) -->
+                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'USED'}" 
+                            class="seat-btn checked-in" 
+                            disabled><i class="bi bi-check-lg"></i></button>
+                            
+                    <!-- Vé cần check-in (status == VALID) -->
+                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'VALID'}" 
+                            class="seat-btn needs-checkin" 
+                            th:classappend="${seat.seatType.name() == 'COUPLE'} ? 'couple' : ''"
+                            th:data-id="${seat.seatId}"
+                            th:data-number="${seat.seatNumber}"
+                            onclick="selectCheckinSeat(this)"
+                            th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">6</button>
+
+                    <!-- Vé không hợp lệ (status == INVALID) -->
+                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'INVALID'}" 
+                            class="seat-btn sold" 
+                            disabled 
+                            th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">X</button>
+                  </th:block>
+                  
+                  <span class="seat-label" th:text="${entry.key}">A</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Legend for Staff -->
+            <div class="d-flex flex-wrap gap-4 mt-4 justify-content-center">
+              <div class="d-flex align-items-center gap-2">
+                <div class="seat-btn disabled-staff" style="width: 24px; height: 24px; opacity: 0.2;"></div>
+                <span class="text-white-50">Ghế chưa bán (Không thao tác)</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="seat-btn needs-checkin" style="width: 24px; height: 24px;"></div>
+                <span class="text-white-50">Vé cần check-in</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="seat-btn selected" style="width: 24px; height: 24px;"></div>
+                <span class="text-white-50">Ghế chọn check-in</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="seat-btn checked-in" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-check-sm"></i></div>
+                <span class="text-white-50">Đã check-in thành công</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="col-lg-4">
+          <div class="staff-action-card">
+            <h4 class="font-title mb-4 border-start border-warning border-4 ps-3 text-warning">Xử Lý Check-In</h4>
+            
+            <div class="mb-3">
+              <label class="text-white-50 d-block mb-1">Phim:</label>
+              <h5 class="text-white font-title" th:text="${showtime.movie.title}">Avatar: Dòng Chảy Của Nước</h5>
+            </div>
+            <div class="mb-3">
+              <label class="text-white-50 d-block mb-1">Phòng & Suất chiếu:</label>
+              <span class="text-white font-title d-block" th:text="${showtime.room.roomName} + ' - ' + ${#temporals.format(showtime.startTime, 'HH:mm')}">Cinema Hall 1 - 19:00</span>
+            </div>
+
+            <hr class="border-secondary my-3" />
+
+            <div class="mb-4">
+              <label class="text-white-50 d-block mb-2">Các ghế chọn soát vé:</label>
+              <div class="bg-dark p-3 rounded text-white font-title mb-0" id="selected-checkin-display" style="min-height: 50px;">
+                Chưa chọn ghế nào
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <form th:action="@{/staff/showtime/{id}/check-in(id=${showtimeId})}" method="post" id="checkinForm">
+                <input type="hidden" name="selectedSeatIds" id="selectedSeatIdsInput" />
+                <button type="submit" class="btn btn-warning btn-lg font-title py-3 text-dark fs-6 w-100" id="checkin-action-btn" disabled>
+                  <i class="bi bi-qr-code-scan me-2"></i>HOÀN TẤT CHECK-IN
+                </button>
+              </form>
+              <a th:href="@{/movie/{id}(id=${showtime.movie.id})}" class="btn btn-outline-secondary py-2 text-white-50 w-100 mt-2">
+                Thoát chế độ
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      function toggleSeat(seat) {
-        if (seat.classList.contains("disabled")) return;
+      let selectedCheckinSeats = [];
 
-        if (seat.classList.contains("btn-outline-secondary")) {
-          seat.classList.remove("btn-outline-secondary");
-          seat.classList.add("btn-success", "selected");
+      function selectCheckinSeat(btn) {
+        btn.classList.toggle('selected');
+        const seatId = btn.getAttribute('data-id');
+        const seatNumber = btn.getAttribute('data-number');
+        
+        if (btn.classList.contains('selected')) {
+          selectedCheckinSeats.push({ id: seatId, number: seatNumber });
         } else {
-          seat.classList.remove("btn-success", "selected");
-          seat.classList.add("btn-outline-secondary");
+          selectedCheckinSeats = selectedCheckinSeats.filter(item => item.id !== seatId);
         }
-      }
 
-      function getSelectedSeats() {
-        const selectedSeat = document.querySelectorAll(".seat-item.selected");
-        const inputHidden = document.getElementById("selectedSeatIdsInput");
-        const selectedIds = Array.from(selectedSeat).map((seat) =>
-          seat.getAttribute("data-id"),
-        );
+        const display = document.getElementById('selected-checkin-display');
+        const actionBtn = document.getElementById('checkin-action-btn');
+        const input = document.getElementById('selectedSeatIdsInput');
 
-        inputHidden.value = selectedIds.join(",");
-
-        console.log("Các ID ghế đã chọn:", selectedIds);
+        if (selectedCheckinSeats.length === 0) {
+          display.textContent = "Chưa chọn ghế nào";
+          actionBtn.disabled = true;
+          input.value = "";
+        } else {
+          display.textContent = selectedCheckinSeats.map(item => item.number).join(', ');
+          actionBtn.disabled = false;
+          input.value = selectedCheckinSeats.map(item => item.id).join(',');
+        }
       }
     </script>
   </body>
