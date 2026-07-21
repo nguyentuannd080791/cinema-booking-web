@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineMax - Đăng Ký</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+      body {
+        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(43, 43, 43, 0.9)), 
+                    url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      }
+      .register-container {
+        min-height: calc(100vh - 64px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+      }
+      .register-card {
+        background-color: rgba(0, 0, 0, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px !important;
+        max-width: 600px;
+        width: 100%;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      }
+      .is-invalid-custom {
+        border-bottom-color: #E50914 !important;
+      }
+      .form-check-input:checked {
+        background-color: #E50914 !important;
+        border-color: #E50914 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar-cinemax">
+      <div class="container d-flex align-items-center justify-content-between">
+        <a class="nav-brand" th:href="@{/home}">
+          <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+        </a>
+        <div class="nav-actions">
+          <a th:href="@{/home}" class="btn-nav-ghost">Trang chủ</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container register-container">
+      <div class="register-card">
+        <h2 class="font-title text-center mb-4 text-white">Đăng Ký Tài Khoản</h2>
+        
+        <form th:action="@{/register}" method="post" th:object="${registerForm}">
+          <div class="row">
+            <!-- Hàng 1: Email (col-12) -->
+            <div class="col-12 mb-3">
+              <div class="form-floating">
+                <input type="email" class="form-control auth-input bg-transparent text-white" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid-custom'" id="floatingEmail" th:field="*{email}" placeholder="name@example.com" required>
+                <label for="floatingEmail" class="text-white-50">Địa chỉ Email</label>
+                <div class="text-danger mt-1" style="font-size: 0.85rem;" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                  Email không hợp lệ
+                </div>
+              </div>
+            </div>
+
+            <!-- Hàng 2: Họ tên (col-6), Số điện thoại (col-6) -->
+            <div class="col-md-6 mb-3">
+              <div class="form-floating">
+                <input type="text" class="form-control auth-input bg-transparent text-white" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid-custom'" id="floatingName" th:field="*{fullName}" placeholder="Full name" required>
+                <label for="floatingName" class="text-white-50">Họ và tên</label>
+                <div class="text-danger mt-1" style="font-size: 0.85rem;" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">
+                  Họ tên không được để trống
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="form-floating">
+                <input type="tel" class="form-control auth-input bg-transparent text-white" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid-custom'" id="floatingPhone" th:field="*{phone}" placeholder="Phone" required>
+                <label for="floatingPhone" class="text-white-50">Số điện thoại</label>
+                <div class="text-danger mt-1" style="font-size: 0.85rem;" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">
+                  Số điện thoại không hợp lệ
+                </div>
+              </div>
+            </div>
+
+            <!-- Hàng 3: Mật khẩu (col-6), Xác nhận mật khẩu (col-6) -->
+            <div class="col-md-6 mb-3">
+              <div class="form-floating">
+                <input type="password" class="form-control auth-input bg-transparent text-white" th:classappend="${#fields.hasErrors('hashPassword')} ? 'is-invalid-custom'" id="floatingPassword" th:field="*{hashPassword}" placeholder="Password" required>
+                <label for="floatingPassword" class="text-white-50">Mật khẩu</label>
+                <div class="text-danger mt-1" style="font-size: 0.85rem;" th:if="${#fields.hasErrors('hashPassword')}" th:errors="*{hashPassword}">
+                  Mật khẩu không hợp lệ
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="form-floating">
+                <input type="password" class="form-control auth-input bg-transparent text-white" id="floatingConfirmPassword" name="confirm-password" placeholder="Confirm Password" required>
+                <label for="floatingConfirmPassword" class="text-white-50">Xác nhận mật khẩu</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkbox Điều khoản -->
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" name="checkbox" value="true" id="flexCheckDefault" required checked>
+            <label class="form-check-label text-muted-custom" for="flexCheckDefault">
+              Tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật của CineMax.
+            </label>
+            <div class="text-danger mt-1" style="font-size: 0.85rem;" th:if="${#fields.hasErrors('global')}" th:errors="*{global}">
+              Chưa đồng ý điều khoản
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary w-100 py-3 mb-3">Đăng Ký</button>
+          
+          <div class="text-center text-muted-custom mt-3">
+            Bạn đã có tài khoản? <a th:href="@{/login}" class="text-danger text-decoration-none">Đăng nhập</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

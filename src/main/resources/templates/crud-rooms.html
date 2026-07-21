@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineMax Admin - Quản lý Phòng</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar-cinemax">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <a class="nav-brand me-4" th:href="@{/home}">
+            <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+          </a>
+          <span class="badge bg-warning text-dark font-title px-2 py-1 fs-6">ADMIN PORTAL</span>
+        </div>
+        <div class="nav-actions">
+          <a th:href="@{/home}" class="btn-nav-ghost"><i class="bi bi-box-arrow-left me-1"></i>Thoát</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Layout Grid -->
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 admin-sidebar">
+          <div class="py-4">
+            <a th:href="@{/admin/dashboard}" class="sidebar-link">
+              <i class="bi bi-speedometer2"></i> Tổng quan
+            </a>
+            <a th:href="@{/admin/movies}" class="sidebar-link">
+              <i class="bi bi-film"></i> Quản lý Phim
+            </a>
+            <a th:href="@{/admin/rooms}" class="sidebar-link active">
+              <i class="bi bi-door-open"></i> Quản lý Phòng
+            </a>
+            <a th:href="@{/admin/seats}" class="sidebar-link">
+              <i class="bi bi-grid-3x3"></i> Quản lý Ghế
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 p-4">
+          <!-- Alerts -->
+          <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${success}">Thành công</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show bg-dark border-danger text-danger mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}">Lỗi</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h2 class="font-title mb-0 border-start border-danger border-4 ps-3 text-white">Danh Sách Phòng Chiếu</h2>
+            <button class="btn btn-danger px-4" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+              <i class="bi bi-plus-lg me-1"></i> Thêm phòng mới
+            </button>
+          </div>
+
+          <!-- Rooms Cards Grid -->
+          <div class="row g-4">
+            <div class="col-md-6 col-lg-4" th:each="room : ${rooms}">
+              <div class="admin-card text-white">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h4 class="font-title text-white mb-1" th:text="${room.roomName}">Cinema Hall 1</h4>
+                    <span class="badge bg-danger">Screen: Standard</span>
+                  </div>
+                  <span class="badge bg-success">Hoạt động</span>
+                </div>
+                <div class="text-white-50 fs-6 mb-3">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span>Sức chứa:</span>
+                    <strong class="text-white" th:text="${room.capacity} + ' ghế'">120 ghế</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span>Số hàng:</span>
+                    <strong class="text-white" th:text="${room.row}">8</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span>Số cột:</span>
+                    <strong class="text-white" th:text="${room.col}">15</strong>
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-warning btn-sm flex-fill" data-bs-toggle="modal" th:data-bs-target="'#editRoomModal-' + ${room.id}"><i class="bi bi-pencil-fill me-1"></i>Sửa</button>
+                  <form th:action="@{/admin/rooms/{id}/delete(id=${room.id})}" method="post" style="display:inline; flex: 0 0 auto;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phòng chiếu này không?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash-fill"></i></button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Room Modal -->
+    <div class="modal fade" id="addRoomModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title font-title"><i class="bi bi-plus-circle-fill me-2 text-danger"></i>Thêm Phòng Chiếu Mới</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form th:action="@{/admin/rooms}" method="post">
+            <div class="modal-body d-flex flex-column gap-3">
+              <div>
+                <label class="form-label text-white-50">Tên phòng chiếu</label>
+                <input type="text" class="form-control form-cine-dark text-white" name="roomName" required placeholder="Ví dụ: Cinema Hall 3..." />
+              </div>
+              <div class="row">
+                <div class="col-6">
+                  <label class="form-label text-white-50">Số hàng ghế</label>
+                  <input type="number" class="form-control form-cine-dark text-white" name="row" required placeholder="8" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label text-white-50">Số cột (ghế mỗi hàng)</label>
+                  <input type="number" class="form-control form-cine-dark text-white" name="col" required placeholder="12" />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-danger px-4 font-title text-white">Tạo Phòng</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Room Modals -->
+    <div th:each="room : ${rooms}" class="modal fade" th:id="'editRoomModal-' + ${room.id}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title font-title"><i class="bi bi-pencil-square me-2 text-warning"></i>Sửa Thông Tin Phòng</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form th:action="@{/admin/rooms}" method="post">
+            <input type="hidden" name="id" th:value="${room.id}" />
+            <div class="modal-body d-flex flex-column gap-3">
+              <div>
+                <label class="form-label text-white-50">Tên phòng chiếu</label>
+                <input type="text" class="form-control form-cine-dark text-white" name="roomName" th:value="${room.roomName}" required />
+              </div>
+              <div class="row">
+                <div class="col-6">
+                  <label class="form-label text-white-50">Số hàng ghế</label>
+                  <input type="number" class="form-control form-cine-dark text-white" name="row" th:value="${room.row}" required />
+                </div>
+                <div class="col-6">
+                  <label class="form-label text-white-50">Số cột</label>
+                  <input type="number" class="form-control form-cine-dark text-white" name="col" th:value="${room.col}" required />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-warning px-4 text-dark font-title">Cập Nhật</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

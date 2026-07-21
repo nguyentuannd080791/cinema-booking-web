@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineMax Admin - Thiết lập Sơ đồ Ghế</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+      .seat-btn.seat-config-normal {
+        border-color: rgba(255,255,255,0.2) !important;
+        background: transparent !important;
+        color: white !important;
+      }
+      .seat-btn.seat-config-vip {
+        border-color: var(--warning, #ffc107) !important;
+        background: rgba(255, 193, 7, 0.1) !important;
+        color: var(--warning, #ffc107) !important;
+      }
+      .seat-btn.seat-config-double {
+        border-color: #ff2e97 !important;
+        background: rgba(255, 46, 151, 0.1) !important;
+        color: #ff2e97 !important;
+        width: 65px !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar-cinemax">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <a class="nav-brand me-4" th:href="@{/home}">
+            <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+          </a>
+          <span class="badge bg-warning text-dark font-title px-2 py-1 fs-6">ADMIN PORTAL</span>
+        </div>
+        <div class="nav-actions">
+          <a th:href="@{/home}" class="btn-nav-ghost"><i class="bi bi-box-arrow-left me-1"></i>Thoát</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Layout Grid -->
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 admin-sidebar">
+          <div class="py-4">
+            <a th:href="@{/admin/dashboard}" class="sidebar-link">
+              <i class="bi bi-speedometer2"></i> Tổng quan
+            </a>
+            <a th:href="@{/admin/movies}" class="sidebar-link">
+              <i class="bi bi-film"></i> Quản lý Phim
+            </a>
+            <a th:href="@{/admin/rooms}" class="sidebar-link">
+              <i class="bi bi-door-open"></i> Quản lý Phòng
+            </a>
+            <a th:href="@{/admin/seats}" class="sidebar-link active">
+              <i class="bi bi-grid-3x3"></i> Quản lý Ghế
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 p-4">
+          <!-- Alerts -->
+          <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${success}">Thành công</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show bg-dark border-danger text-danger mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}">Lỗi</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h2 class="font-title mb-0 border-start border-danger border-4 ps-3 text-white">Thiết Lập Sơ Đồ Ghế</h2>
+          </div>
+
+          <!-- Room Selector -->
+          <div class="admin-card mb-4 py-3">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-4">
+                <label class="text-white-50 form-label mb-1">Chọn phòng chiếu:</label>
+                <select class="form-select form-cine-dark text-white" id="roomSelector" onchange="window.location.href='/admin/seats?roomId=' + this.value">
+                  <option th:each="room : ${rooms}" 
+                          th:value="${room.id}" 
+                          th:text="${room.roomName} + ' (' + ${room.capacity} + ' Ghế)'"
+                          th:selected="${room.id == selectedRoomId}"></option>
+                </select>
+              </div>
+              <div class="col-md-8 d-flex flex-wrap gap-3 justify-content-md-end pt-3">
+                <div class="d-flex align-items-center gap-1">
+                  <div class="seat-btn seat-config-normal" style="width: 20px; height: 20px;"></div>
+                  <small class="text-white-50">Ghế thường</small>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  <div class="seat-btn seat-config-vip" style="width: 20px; height: 20px;"></div>
+                  <small class="text-white-50">Ghế VIP</small>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  <div class="seat-btn seat-config-double" style="width: 30px; height: 20px;"></div>
+                  <small class="text-white-50">Ghế Đôi</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seat layout generator -->
+          <div class="admin-card mb-4" th:if="${selectedRoom != null}">
+            <h4 class="font-title mb-3 text-white"><i class="bi bi-grid-3x3 me-2 text-danger"></i>Thiết lập lưới hàng & cột mới</h4>
+            <form th:action="@{/admin/seats/grid}" method="post">
+              <input type="hidden" name="roomId" th:value="${selectedRoomId}" />
+              <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                  <label class="text-white-50 form-label mb-1">Số hàng ghế:</label>
+                  <input type="number" class="form-control form-cine-dark text-white" name="rows" th:value="${selectedRoom.row}" min="1" max="26" required />
+                </div>
+                <div class="col-md-4">
+                  <label class="text-white-50 form-label mb-1">Số cột (ghế mỗi hàng):</label>
+                  <input type="number" class="form-control form-cine-dark text-white" name="cols" th:value="${selectedRoom.col}" min="1" max="30" required />
+                </div>
+                <div class="col-md-4">
+                  <button type="submit" class="btn btn-danger w-100 py-2 font-title"><i class="bi bi-arrow-repeat me-1"></i>Reset & Tạo lưới ghế mới</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Interactive Setup Panel -->
+          <div class="admin-card mb-4" th:if="${selectedRoom != null}">
+            <div class="text-center mb-4">
+              <p class="text-warning mb-2"><i class="bi bi-info-circle-fill me-1"></i>Mẹo: Click vào bất kỳ ghế nào dưới đây để thay đổi nhanh loại ghế của nó</p>
+              <div class="screen-3d mx-auto" style="max-width: 600px;"></div>
+              <small class="text-white-50 font-title">MÀN HÌNH CHIẾU</small>
+            </div>
+
+            <!-- Seat grid matrix -->
+            <div class="overflow-auto pb-3">
+              <div class="seating-matrix text-center" style="min-width: 600px;">
+                <div class="seat-row" th:each="entry : ${seatMap}">
+                  <span class="seat-label" th:text="${entry.key}">A</span>
+                  
+                  <button th:each="seat : ${entry.value}" 
+                          class="seat-btn" 
+                          th:classappend="${seat.seatType.name() == 'VIP'} ? 'seat-config-vip' : (${seat.seatType.name() == 'COUPLE'} ? 'seat-config-double' : 'seat-config-normal')"
+                          data-bs-toggle="modal" 
+                          th:data-bs-target="'#editSeatTypeModal-' + ${seat.id}"
+                          th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">1</button>
+                          
+                  <span class="seat-label" th:text="${entry.key}">A</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Seat Type Modals -->
+    <div th:each="entry : ${seatMap}" th:remove="tag" th:if="${seatMap != null}">
+      <div th:each="seat : ${entry.value}" class="modal fade" th:id="'editSeatTypeModal-' + ${seat.id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+          <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+              <h5 class="modal-title font-title text-white" th:text="'Thay đổi Loại Ghế ' + ${seat.seatNumber}">Thay đổi Loại Ghế</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/seats/{id}/type(id=${seat.id})}" method="post">
+              <div class="modal-body">
+                <label class="form-label text-white-50">Chọn loại ghế:</label>
+                <select class="form-select form-cine-dark text-white" name="seatType">
+                  <option value="NORMAL" th:selected="${seat.seatType.name() == 'NORMAL'}">NORMAL (Thường)</option>
+                  <option value="VIP" th:selected="${seat.seatType.name() == 'VIP'}">VIP (Thương gia)</option>
+                  <option value="COUPLE" th:selected="${seat.seatType.name() == 'COUPLE'}">COUPLE (Ghế đôi)</option>
+                </select>
+              </div>
+              <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-warning text-dark font-title px-4">Lưu lại</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

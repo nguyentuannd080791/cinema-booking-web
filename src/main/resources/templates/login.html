@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineMax - Đăng Nhập</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+      body {
+        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(43, 43, 43, 0.9)), 
+                    url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      }
+      .login-container {
+        min-height: calc(100vh - 64px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-card {
+        background-color: rgba(0, 0, 0, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px !important;
+        max-width: 420px;
+        width: 100%;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar-cinemax">
+      <div class="container d-flex align-items-center justify-content-between">
+        <a class="nav-brand" th:href="@{/home}">
+          <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+        </a>
+        <div class="nav-actions">
+          <a th:href="@{/home}" class="btn-nav-ghost">Trang chủ</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container login-container">
+      <div class="login-card">
+        <h2 class="font-title text-center mb-4 text-white">Đăng Nhập</h2>
+        
+        <form th:action="@{/login}" method="post">
+          <!-- Email Floating Input -->
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control auth-input bg-transparent text-white" id="floatingEmail" name="email" placeholder="name@example.com" th:value="${email}" required>
+            <label for="floatingEmail" class="text-white-50">Địa chỉ Email</label>
+          </div>
+
+          <!-- Password Floating Input -->
+          <div class="form-floating mb-4">
+            <input type="password" class="form-control auth-input bg-transparent text-white" id="floatingPassword" name="password" placeholder="Password" required>
+            <label for="floatingPassword" class="text-white-50">Mật khẩu</label>
+            <div class="text-danger mt-2" style="font-size: 0.85rem;" th:if="${error}">
+              <i class="bi bi-exclamation-circle me-1"></i><span th:text="${error}">Sai tài khoản hoặc mật khẩu</span>
+            </div>
+          </div>
+
+          <div class="mb-4 d-flex justify-content-between align-items-center">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe">
+              <label class="form-check-label text-muted-custom" for="rememberMe">Ghi nhớ tôi</label>
+            </div>
+            <a href="#" class="text-danger text-decoration-none" style="font-size: 0.9rem;">Quên mật khẩu?</a>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary w-100 py-3 mb-3">Đăng Nhập</button>
+          
+          <div class="text-center text-muted-custom mt-3">
+            Bạn chưa có tài khoản? <a th:href="@{/register}" class="text-danger text-decoration-none">Đăng ký ngay</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
