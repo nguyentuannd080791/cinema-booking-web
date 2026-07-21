@@ -2,6 +2,7 @@ package com.springboot.cinema.controller;
 
 import com.springboot.cinema.dto.UserInformationDTO;
 import com.springboot.cinema.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +27,10 @@ public class LoginController {
     public String login(
             @RequestParam String email,
             @RequestParam String password,
+            HttpServletRequest request,
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
-        System.out.println(email + "....." + password);
         UserInformationDTO userInformationDTO = userService.login(email, password);
 
         if(userInformationDTO == null){
@@ -38,7 +39,15 @@ public class LoginController {
             return "redirect:/login";
         }
 
+        // Đổi session ID để chống session fixation, nhưng vẫn giữ lại dữ liệu chọn ghế đang chờ (nếu có).
+        // changeSessionId() thuộc HttpServletRequest, không phải HttpSession.
+        request.changeSessionId();
         session.setAttribute("user", userInformationDTO);
+
+        if (session.getAttribute("showtimeId") != null) {
+            return "redirect:/confirm-booking";
+        }
+
         return "redirect:/home";
     }
 
