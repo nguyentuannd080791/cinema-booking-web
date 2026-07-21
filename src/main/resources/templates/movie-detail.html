@@ -1,39 +1,277 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Movie Details</title>
+    <title>CineMax - Chi Tiết Phim</title>
+    <!-- Bootstrap CSS -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+    <style>
+      .backdrop-section {
+        position: relative;
+        height: 400px;
+        background-size: cover;
+        background-position: center;
+      }
+      .detail-container {
+        margin-top: -150px;
+        position: relative;
+        z-index: 10;
+      }
+      .movie-detail-poster {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        border: 2px solid rgba(255,255,255,0.1);
+      }
+      .dot-separator::after {
+        content: " • ";
+        padding: 0 8px;
+        color: var(--accent, #E50914);
+      }
+      .dot-separator:last-child::after {
+        content: "";
+      }
+      .showtime-btn {
+        background-color: rgba(255,255,255,0.08);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px !important;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .showtime-btn:hover {
+        background-color: var(--accent, #E50914);
+        color: white;
+        border-color: var(--accent, #E50914);
+        transform: translateY(-2px);
+      }
+      .staff-showtime-box {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1.5rem;
+      }
+    </style>
   </head>
   <body>
-    <div class="detail">
-      Information
-      <img th:src="${movie.posterURL}" class="img-fluid rounded-top" alt="" />
-      <div class="info">
-        <p>Tên phim: <span th:text="${movie.title}"></span></p>
-        <p>Ngày ra mắt: <span th:text="${movie.releaseDate}"></span></p>
+    <!-- Navbar -->
+    <nav class="navbar-cinemax">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <a class="nav-brand me-4" th:href="@{/home}">
+            <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+          </a>
+          
+          <!-- Admin Navigation Links (only shown when role is admin) -->
+          <div class="d-none d-lg-flex align-items-center gap-3" th:if="${user != null && user.role.name() == 'ADMIN'}">
+            <a th:href="@{/admin/dashboard}" class="text-white text-decoration-none fw-bold fs-6"><i class="bi bi-speedometer2 me-1 text-warning"></i>Dashboard</a>
+            <a th:href="@{/admin/movies}" class="text-white-50 text-decoration-none fw-bold fs-6"><i class="bi bi-film me-1"></i>Phim</a>
+            <a th:href="@{/admin/rooms}" class="text-white-50 text-decoration-none fw-bold fs-6"><i class="bi bi-door-open me-1"></i>Phòng</a>
+            <a th:href="@{/admin/seats}" class="text-white-50 text-decoration-none fw-bold fs-6"><i class="bi bi-grid-3x3 me-1"></i>Ghế</a>
+          </div>
+        </div>
+
+        <div class="nav-actions">
+          <!-- Chưa đăng nhập -->
+          <span th:if="${user == null}">
+            <a th:href="@{/login}" class="btn-nav-ghost">Đăng nhập</a>
+            <a th:href="@{/register}" class="btn-nav-primary">Đăng ký</a>
+          </span>
+          <!-- Đã đăng nhập -->
+          <span th:unless="${user == null}" class="d-flex align-items-center gap-3">
+            <span class="text-white-50 fs-6">
+              Xin chào, <strong class="text-white" th:text="${user.fullName}">Khách</strong>
+              <span th:if="${user.role.name() == 'ADMIN'}" class="badge bg-danger ms-1">Admin</span>
+              <span th:if="${user.role.name() == 'STAFF'}" class="badge bg-warning text-dark ms-1">Nhân viên</span>
+              <span th:if="${user.role.name() == 'CUSTOMER'}" class="badge bg-success ms-1">Khách hàng</span>
+            </span>
+            <a th:href="@{/my-bookings}" class="btn-nav-ghost"><i class="bi bi-receipt me-1"></i>Đơn đặt vé của tôi</a>
+            <a th:href="@{/logout}" class="btn-nav-ghost text-danger ms-2" style="border: 1px solid rgba(220,53,69,0.3); padding: 5px 12px; border-radius: 4px;">Đăng xuất</a>
+          </span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Backdrop Image Section -->
+    <div class="backdrop-section" th:style="'background-image: linear-gradient(to bottom, rgba(20, 20, 20, 0.2) 0%, rgba(20, 20, 20, 1) 100%), url(\'' + ${movie.posterURL} + '\');'"></div>
+
+    <!-- Main Detail Container -->
+    <div class="container detail-container mb-5">
+      <div class="row g-4">
+        <!-- Poster & Trailer Button -->
+        <div class="col-md-4 col-lg-3">
+          <img th:src="${movie.posterURL}" th:alt="${movie.title}" class="movie-detail-poster mb-3" />
+          <button class="btn btn-outline-light w-100 py-2 btn-trailer" style="border-radius: 4px;"><i class="bi bi-play-fill me-2"></i>Xem Trailer</button>
+        </div>
+
+        <!-- Movie Information -->
+        <div class="col-md-8 col-lg-9 text-white d-flex flex-column justify-content-end">
+          <div class="mb-3">
+            <span class="badge bg-danger p-2 mb-2 font-title" th:text="${movie.ageRating}">C13</span>
+          </div>
+          <h1 class="display-4 font-title mb-2" th:text="${movie.title}">Avatar: Dòng Chảy Của Nước</h1>
+          
+          <div class="d-flex flex-wrap mb-4 text-muted-custom">
+            <span class="dot-separator" th:text="${movie.categoryList != null && !movie.categoryList.isEmpty() ? #strings.listJoin(movie.categoryList.![categoryName], ', ') : 'Chưa có thể loại'}">Hành động, Khoa học viễn tưởng</span>
+            <span class="dot-separator"><span th:text="${movie.duration}">192</span> phút</span>
+            <span class="dot-separator">Khởi chiếu: <span th:text="${#temporals.format(movie.releaseDate, 'dd/MM/yyyy')}">16/12/2022</span></span>
+          </div>
+
+          <h4 class="font-title mb-2">Nội dung phim</h4>
+          <p class="text-muted-custom leading-relaxed" th:text="${movie.description}">
+            Hơn một thập kỷ sau các sự kiện của phần phim đầu tiên, "Avatar: The Way of Water" kể câu chuyện về gia đình Sully (Jake, Neytiri và con của họ), những rắc rối theo sau họ, những nỗ lực họ thực hiện để giữ an toàn cho nhau, những trận chiến họ phải chiến đấu để sinh tồn và những bi kịch họ phải chịu đựng.
+          </p>
+        </div>
+      </div>
+
+      <hr class="border-secondary my-5" />
+
+      <!-- Showtime Section for Customers -->
+      <div class="mb-5">
+        <h3 class="font-title mb-4 border-start border-danger border-4 ps-3 text-white">Lịch Chiếu Phim (Khách Hàng)</h3>
+        
+        <!-- Date Selector Bar -->
+        <div class="d-flex gap-2 overflow-auto pb-3 mb-4" style="scrollbar-width: thin;" th:if="${showtimeDates != null && !showtimeDates.isEmpty()}">
+          <a th:each="d : ${showtimeDates}" 
+             th:href="@{/movie/{id}(id=${movie.id}, date=${d})}"
+             class="btn px-4 py-2 text-start text-decoration-none" 
+             th:classappend="${d.isEqual(selectedDate)} ? 'btn-outline-danger active' : 'btn-outline-secondary text-white-50'"
+             style="min-width: 140px; border-radius: 8px;">
+            <span class="d-block small" th:text="${d.isEqual(T(java.time.LocalDate).now()) ? 'Hôm nay' : (d.isEqual(T(java.time.LocalDate).now().plusDays(1)) ? 'Ngày mai' : (d.getDayOfWeek().name() == 'SUNDAY' ? 'Chủ Nhật' : 'Thứ ' + (d.getDayOfWeek().getValue() + 1)))}">Hôm nay</span>
+            <span class="fw-bold font-title text-white" th:text="${#temporals.format(d, 'dd/MM')}">20/07</span>
+          </a>
+        </div>
+
+        <!-- Rooms & Formats Grid -->
+        <div class="d-flex flex-column gap-4" th:if="${showtimesByRoom != null && !showtimesByRoom.isEmpty()}">
+          <div th:each="entry : ${showtimesByRoom}" class="bg-card p-4 rounded-3 border border-secondary border-opacity-20">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <h5 class="mb-0 font-title text-white">
+                <i class="bi bi-door-open-fill text-danger me-2"></i>
+                <span th:text="${entry.key.roomName}">Cinema Hall 1</span>
+              </h5>
+              <span class="badge bg-secondary">Chuẩn 2D</span>
+            </div>
+            <div class="d-flex flex-wrap gap-3">
+              <a th:each="showtime : ${entry.value}" 
+                 th:href="@{/showtime/{id}(id=${showtime.id})}" 
+                 class="showtime-btn text-center py-2 px-4" 
+                 th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">09:00</a>
+            </div>
+          </div>
+        </div>
+
+        <div th:if="${showtimesByRoom == null || showtimesByRoom.isEmpty()}" class="text-white-50 py-5 text-center bg-card rounded-3">
+          <i class="bi bi-calendar-x fs-1 d-block mb-2 text-danger"></i>
+          Không có suất chiếu nào hoạt động cho ngày này.
+        </div>
+      </div>
+
+      <!-- Showtime Section for Staff -->
+      <div class="staff-showtime-box mb-5" th:if="${user != null && (user.role.name() == 'STAFF' || user.role.name() == 'ADMIN') && showtimesByRoom != null && !showtimesByRoom.isEmpty()}">
+        <h4 class="font-title mb-3 text-warning"><i class="bi bi-shield-lock-fill me-2"></i>Khu Vực Nghiệp Vụ Nhân Viên (STAFF ONLY)</h4>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle border-secondary m-0">
+            <thead>
+              <tr>
+                <th>Giờ Chiếu</th>
+                <th>Phòng</th>
+                <th class="text-end">Tác vụ nghiệp vụ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <th:block th:each="entry : ${showtimesByRoom}">
+                <tr th:each="showtime : ${entry.value}">
+                  <td><strong th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">09:00</strong></td>
+                  <td th:text="${entry.key.roomName}">Cinema Hall 1</td>
+                  <td class="text-end">
+                    <a th:href="@{/staff/showtime/{id}/check-in(id=${showtime.id})}" class="btn btn-secondary btn-sm me-2 px-3"><i class="bi bi-qr-code-scan me-1"></i>Check-in</a>
+                    <a th:href="@{/staff/showtime/{id}/walk-in(id=${showtime.id})}" class="btn btn-primary btn-sm px-3"><i class="bi bi-person-plus-fill me-1"></i>Walk-in</a>
+                  </td>
+                </tr>
+              </th:block>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div th:if="${session.user == null || session.user?.role?.name() == 'CUSTOMER'}">
-        <div th:each="showtime : ${movie.showtimeList}">
-            <a th:href="@{/showtime/{id}(id=${showtime.id})}" th:text="${showtime.startTime}"></a>
+    <!-- Footer -->
+    <footer class="footer-cine">
+      <div class="container">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 2rem; flex-wrap: wrap;">
+          <div>
+            <a class="footer-brand" th:href="@{/home}">CINE<span>MAX</span></a>
+            <p class="footer-desc">
+              Trải nghiệm điện ảnh đỉnh cao với hệ thống đặt vé trực tuyến nhanh chóng, tiện lợi và hiện đại nhất Việt Nam.
+            </p>
+            <div class="social-row">
+              <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
+              <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+            </div>
+          </div>
+          <div>
+            <div class="footer-heading">Liên kết nhanh</div>
+            <a th:href="@{/home}" class="footer-link">Trang chủ</a>
+            <a href="#" class="footer-link">Lịch chiếu</a>
+            <a href="#" class="footer-link">Tin tức điện ảnh</a>
+            <a href="#" class="footer-link">Ưu đãi thành viên</a>
+          </div>
+          <div>
+            <div class="footer-heading">Điều khoản</div>
+            <a href="#" class="footer-link">Điều khoản sử dụng</a>
+            <a href="#" class="footer-link">Chính sách bảo mật</a>
+            <a href="#" class="footer-link">Chính sách thanh toán</a>
+            <a href="#" class="footer-link">Chăm sóc khách hàng</a>
+          </div>
+          <div>
+            <div class="footer-heading">Đăng ký nhận thông tin</div>
+            <p class="footer-desc" style="margin-bottom: 12px;">
+              Nhận khuyến mãi và thông báo lịch chiếu phim sớm nhất.
+            </p>
+            <div style="display: flex; gap: 8px;">
+              <input type="email" class="form-cine" placeholder="Email của bạn..." style="flex: 1;" />
+              <button class="btn-cine btn-cine-primary" style="flex-shrink: 0;">
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
+          </div>
         </div>
-    </div>
+        <div class="footer-bottom">
+          <span class="footer-bottom-text">© 2026 CineMax System. Bảo lưu mọi quyền.</span>
+          <span class="footer-bottom-text">Phát triển bởi <strong style="color: var(--text-secondary);">CineMax Team</strong></span>
+        </div>
+      </div>
+    </footer>
 
-    <div th:if="${session.user?.role?.name() == 'STAFF'}">
-        <div th:each="showtime : ${movie.showtimeList}">
-            <p>Check in: <span><a th:href="@{/staff/showtime/{id}/check-in(id=${showtime.id})}" th:text="${showtime.startTime}"></a></span></p>
-            <p>Walk in: <span><a th:href="@{/staff/showtime/{id}/walk-in(id=${showtime.id})}" th:text="${showtime.startTime}"></a></span></p>
-        </div>
-    </div>
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const btnTrailer = document.querySelector('.btn-trailer');
+      if (btnTrailer) {
+        btnTrailer.addEventListener('mouseenter', function() {
+          this.style.backgroundColor = '#E50914';
+          this.style.borderColor = '#E50914';
+        });
+        btnTrailer.addEventListener('mouseleave', function() {
+          this.style.backgroundColor = 'transparent';
+          this.style.borderColor = '#FFF';
+        });
+      }
+    </script>
   </body>
 </html>
