@@ -33,6 +33,10 @@ public class HomeController {
         String movieName = (rawMovieName == null || rawMovieName.trim().isEmpty()) ? null : rawMovieName;
         String categoryName = (rawCategoryName == null || rawCategoryName.trim().isEmpty()) ? null : rawCategoryName;
 
+        // Giới hạn page/size hợp lệ để tránh URL bất thường gây lỗi hoặc tải danh sách quá lớn
+        page = Math.max(page, 0);
+        size = Math.min(Math.max(size, 1), 50);
+
         Page<Movie> moviePage = movieService.getMovieList(movieName, categoryName, page, size);
         List<Category> categoryList = categoryService.getCategoryList();
 
