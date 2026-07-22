@@ -134,11 +134,9 @@ public class SeatServiceImpl implements SeatService {
                     "Vui lòng xoá/di chuyển các suất chiếu liên quan trước khi tạo lại lưới ghế.");
         }
 
-        // Delete existing seats in the room first
         List<Seat> existingSeats = seatRepository.findByRoomId(roomId);
         seatRepository.deleteAll(existingSeats);
 
-        // Generate new grid
         List<Seat> newSeats = new ArrayList<>();
         for (int r = 1; r <= rows; r++) {
             char rowLetter = (char) ('A' + r - 1);
@@ -151,7 +149,6 @@ public class SeatServiceImpl implements SeatService {
         }
         seatRepository.saveAll(newSeats);
 
-        // Update room capacity & grid dims
         room.setRow(rows);
         room.setCol(cols);
         room.setCapacity(rows * cols);

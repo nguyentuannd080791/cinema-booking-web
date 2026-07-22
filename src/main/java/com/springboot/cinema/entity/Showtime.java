@@ -21,6 +21,9 @@ public class Showtime {
 
     private BigDecimal price;
 
+    @Enumerated(EnumType.STRING)
+    private ShowtimeStatus status = ShowtimeStatus.DRAFT;
+
     @ManyToOne
     @JoinColumn(name = "movie_id", referencedColumnName = "movie_id")
     private Movie movie;
@@ -71,6 +74,14 @@ public class Showtime {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public ShowtimeStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ShowtimeStatus status) {
+        this.status = status;
     }
 
     public Movie getMovie() {

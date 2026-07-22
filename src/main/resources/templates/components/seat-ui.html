@@ -31,9 +31,9 @@
 
         <button type="button" style="width: 40px; height: 40px; font-size: 14px"
           class="btn p-0 d-flex align-items-center justify-content-center seat-item" th:each="seat : ${entry.value}"
-          th:classappend="${seat.ticketStatus == null ? 
-              (mode == 'STAFF_CHECKIN' ? 'btn-light text-muted disabled' : 'btn-outline-secondary') : 
-              (seat.ticketStatus.name() == 'VALID' && mode == 'STAFF_CHECKIN' ? 
+          th:classappend="${seat.ticketStatus == null ?
+              (mode == 'STAFF_CHECKIN' ? 'btn-light text-muted disabled' : 'btn-outline-secondary') :
+              (seat.ticketStatus.name() == 'VALID' && mode == 'STAFF_CHECKIN' ?
                     'btn-outline-secondary' : 'btn-danger disabled')}" th:data-id="${seat.seatId}"
           th:data-number="${seat.seatNumber}" th:text="${seat.seatNumber}" th:onclick="toggleSeat(this)"></button>
       </div>

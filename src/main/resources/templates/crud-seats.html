@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineMax Admin - Thiết lập Sơ đồ Ghế</title>
-    <!-- Bootstrap CSS -->
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -34,7 +34,7 @@
     </style>
   </head>
   <body>
-    <!-- Navbar -->
+
     <nav class="navbar-cinemax">
       <div class="container d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
@@ -49,10 +49,9 @@
       </div>
     </nav>
 
-    <!-- Main Layout Grid -->
     <div class="container-fluid px-0">
       <div class="row g-0">
-        <!-- Sidebar -->
+
         <div class="col-md-3 col-lg-2 admin-sidebar">
           <div class="py-4">
             <a th:href="@{/admin/dashboard}" class="sidebar-link">
@@ -67,12 +66,14 @@
             <a th:href="@{/admin/seats}" class="sidebar-link active">
               <i class="bi bi-grid-3x3"></i> Quản lý Ghế
             </a>
+            <a th:href="@{/admin/showtimes}" class="sidebar-link">
+              <i class="bi bi-calendar-event"></i> Quản lý Lịch chiếu
+            </a>
           </div>
         </div>
 
-        <!-- Main Content -->
         <div class="col-md-9 col-lg-10 p-4">
-          <!-- Alerts -->
+
           <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             <span th:text="${success}">Thành công</span>
@@ -88,14 +89,13 @@
             <h2 class="font-title mb-0 border-start border-danger border-4 ps-3 text-white">Thiết Lập Sơ Đồ Ghế</h2>
           </div>
 
-          <!-- Room Selector -->
           <div class="admin-card mb-4 py-3">
             <div class="row g-3 align-items-center">
               <div class="col-md-4">
                 <label class="text-white-50 form-label mb-1">Chọn phòng chiếu:</label>
                 <select class="form-select form-cine-dark text-white" id="roomSelector" onchange="window.location.href='/admin/seats?roomId=' + this.value">
-                  <option th:each="room : ${rooms}" 
-                          th:value="${room.id}" 
+                  <option th:each="room : ${rooms}"
+                          th:value="${room.id}"
                           th:text="${room.roomName} + ' (' + ${room.capacity} + ' Ghế)'"
                           th:selected="${room.id == selectedRoomId}"></option>
                 </select>
@@ -117,7 +117,6 @@
             </div>
           </div>
 
-          <!-- Seat layout generator -->
           <div class="admin-card mb-4" th:if="${selectedRoom != null}">
             <h4 class="font-title mb-3 text-white"><i class="bi bi-grid-3x3 me-2 text-danger"></i>Thiết lập lưới hàng & cột mới</h4>
             <form th:action="@{/admin/seats/grid}" method="post">
@@ -138,7 +137,6 @@
             </form>
           </div>
 
-          <!-- Interactive Setup Panel -->
           <div class="admin-card mb-4" th:if="${selectedRoom != null}">
             <div class="text-center mb-4">
               <p class="text-warning mb-2"><i class="bi bi-info-circle-fill me-1"></i>Mẹo: Click vào bất kỳ ghế nào dưới đây để thay đổi nhanh loại ghế của nó</p>
@@ -146,19 +144,18 @@
               <small class="text-white-50 font-title">MÀN HÌNH CHIẾU</small>
             </div>
 
-            <!-- Seat grid matrix -->
             <div class="overflow-auto pb-3">
               <div class="seating-matrix text-center" style="min-width: 600px;">
                 <div class="seat-row" th:each="entry : ${seatMap}">
                   <span class="seat-label" th:text="${entry.key}">A</span>
-                  
-                  <button th:each="seat : ${entry.value}" 
-                          class="seat-btn" 
+
+                  <button th:each="seat : ${entry.value}"
+                          class="seat-btn"
                           th:classappend="${seat.seatType.name() == 'VIP'} ? 'seat-config-vip' : (${seat.seatType.name() == 'COUPLE'} ? 'seat-config-double' : 'seat-config-normal')"
-                          data-bs-toggle="modal" 
+                          data-bs-toggle="modal"
                           th:data-bs-target="'#editSeatTypeModal-' + ${seat.id}"
                           th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">1</button>
-                          
+
                   <span class="seat-label" th:text="${entry.key}">A</span>
                 </div>
               </div>
@@ -168,7 +165,6 @@
       </div>
     </div>
 
-    <!-- Edit Seat Type Modals -->
     <div th:each="entry : ${seatMap}" th:remove="tag" th:if="${seatMap != null}">
       <div th:each="seat : ${entry.value}" class="modal fade" th:id="'editSeatTypeModal-' + ${seat.id}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -196,7 +192,6 @@
       </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

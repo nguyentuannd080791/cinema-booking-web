@@ -13,4 +13,14 @@ public interface ShowtimeService {
     List<LocalDate> getShowtimeDates(int movieId);
 
     Map<Room, List<Showtime>> getShowtimesByRoomAndDate(int movieId, LocalDate date);
+
+    List<Showtime> getShowtimesByMovieId(int movieId);
+
+    long countSoldTickets(int showtimeId);
+
+    Showtime saveShowtime(Showtime showtime, int movieId, int roomId);
+
+    Showtime openForSale(int showtimeId);
+
+    void deleteShowtime(int showtimeId);
 }

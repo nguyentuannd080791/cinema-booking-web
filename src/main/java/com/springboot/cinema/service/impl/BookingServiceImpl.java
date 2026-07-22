@@ -54,31 +54,31 @@ public class BookingServiceImpl implements BookingService {
         Showtime showtime = showtimeRepository.findById(showtimeId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy suất chiếu."));
 
+        if (showtime.getStatus() != ShowtimeStatus.OPEN) {
+            throw new IllegalStateException("Suất chiếu này chưa được mở bán, vui lòng chọn suất chiếu khác.");
+        }
+
         if (selectedSeatIds == null || selectedSeatIds.isEmpty()) {
             throw new IllegalArgumentException("Không có ghế nào được chọn.");
         }
 
-        // Chuẩn hoá danh sách ghế: loại trùng lặp, báo lỗi nếu có ID bị lặp
         List<Integer> distinctSeatIds = selectedSeatIds.stream().distinct().collect(Collectors.toList());
         if (distinctSeatIds.size() != selectedSeatIds.size()) {
             throw new IllegalArgumentException("Danh sách ghế chứa giá trị trùng lặp.");
         }
 
-        // Chỉ chấp nhận ghế thuộc đúng phòng chiếu của suất chiếu này, và phải tồn tại đủ số lượng
         int roomId = showtime.getRoom().getId();
         List<Seat> verifiedSeats = seatRepository.findByRoomIdAndIdIn(roomId, distinctSeatIds);
         if (verifiedSeats.size() != distinctSeatIds.size()) {
             throw new IllegalArgumentException("Một hoặc nhiều ghế không thuộc phòng chiếu của suất chiếu này hoặc không tồn tại.");
         }
 
-        // Validate seats availability before booking to prevent race condition
         seatService.validateSeatsAreAvailable(showtimeId, distinctSeatIds);
 
         Booking booking = saveBooking(user, showtime, distinctSeatIds);
 
         saveTickets(booking, showtime, verifiedSeats);
 
-        // Chỉ khởi tạo Payment cho luồng đặt vé online (PENDING); luồng Staff walk-in đã PAID ngay, không cần thanh toán.
         if (booking.getBookingStatus() == BookingStatus.PENDING) {
             paymentService.initiatePayment(booking);
         }

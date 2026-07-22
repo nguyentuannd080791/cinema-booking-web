@@ -2,9 +2,7 @@ package com.springboot.cinema.controller;
 
 import com.springboot.cinema.dto.SeatListDTO;
 import com.springboot.cinema.dto.UserInformationDTO;
-import com.springboot.cinema.entity.Booking;
-import com.springboot.cinema.entity.BookingStatus;
-import com.springboot.cinema.entity.Role;
+import com.springboot.cinema.entity.*;
 import com.springboot.cinema.service.BookingService;
 import com.springboot.cinema.service.SeatService;
 import com.springboot.cinema.service.ShowtimeService;
@@ -49,13 +47,15 @@ public class ShowtimeController {
     @GetMapping("/showtime/{id}")
     public String getSeat(Model model,
                           @PathVariable("id") String rawShowtimeId,
-                          HttpSession session) {
-        if (session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-
+                          RedirectAttributes redirectAttributes) {
         Integer showtimeId = parseIdOrNull(rawShowtimeId);
         if (showtimeId == null) {
+            return "redirect:/home";
+        }
+
+        Showtime showtime = showtimeService.getShowtimeById(showtimeId);
+        if (showtime == null || showtime.getStatus() != ShowtimeStatus.OPEN) {
+            redirectAttributes.addFlashAttribute("error", "Suất chiếu này chưa được mở bán hoặc không tồn tại.");
             return "redirect:/home";
         }
 
@@ -84,8 +84,6 @@ public class ShowtimeController {
             return "redirect:/home";
         }
 
-        // Nếu đang có một booking PENDING dở dang trong session, không tạo booking mới đè lên nó —
-        // chuyển thẳng về /confirm-booking để khách xử lý xong đơn cũ trước (tránh vô tình "mồ côi" ghế đã giữ).
         Integer existingBookingId = (Integer) session.getAttribute("bookingId");
         if (existingBookingId != null) {
             Booking existingBooking = bookingService.getBookingById(existingBookingId);
@@ -93,29 +91,27 @@ public class ShowtimeController {
                 redirectAttributes.addFlashAttribute("error", "Bạn đang có một đơn đặt vé chờ thanh toán. Vui lòng hoàn tất hoặc huỷ đơn đó trước khi đặt ghế khác.");
                 return "redirect:/confirm-booking";
             }
-            // Booking cũ không còn PENDING (đã PAID/CANCELLED) — dọn session để tránh tham chiếu lỗi thời.
+
             session.removeAttribute("bookingId");
         }
 
         try {
-            // Validate seats before storing in session
+
             seatService.validateSeatsAreAvailable(showtimeId, selectedSeatIds);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/showtime/" + showtimeId;
         }
 
-        // Lưu lựa chọn vào session TRƯỚC khi kiểm tra đăng nhập, để sống sót qua bước /login.
         session.setAttribute("showtimeId", showtimeId);
         session.setAttribute("selectedSeatIds", selectedSeatIds);
 
         UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
         if (user == null) {
-            // Chưa đăng nhập: không tạo booking, chỉ chuyển hướng sang trang login.
+
             return "redirect:/login";
         }
 
-        // Đã đăng nhập: đây là POST nên ghi dữ liệu (tạo booking) ngay tại đây là hợp lệ.
         try {
             Booking booking = bookingService.createBooking(user.getUserId(), showtimeId, selectedSeatIds);
             session.setAttribute("bookingId", booking.getId());
@@ -199,7 +195,8 @@ public class ShowtimeController {
     public String walkIn(HttpSession session,
                          @PathVariable("id") String rawShowtimeId,
                          @RequestParam("selectedSeatIds") List<Integer> selectedSeatIds,
-                         RedirectAttributes redirectAttributes) {
+                         RedirectAttributes redirectAttributes)
+    {
         if (isNotStaff(session))
             return "redirect:/home";
 
@@ -235,7 +232,7 @@ public class ShowtimeController {
                     return seatNum.substring(0, i);
                 }
             }
-            return String.valueOf((char) ('A' + seat.getRowIndex() - 1));
+            return String.valueOf((char)('A' + seat.getRowIndex() - 1));
         }, TreeMap::new, Collectors.toList()));
 
         model.addAttribute("seatMap", seatMap);
