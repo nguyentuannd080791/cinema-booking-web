@@ -47,7 +47,18 @@ public class ShowtimeController {
     @GetMapping("/showtime/{id}")
     public String getSeat(Model model,
                           @PathVariable("id") String rawShowtimeId,
-                          RedirectAttributes redirectAttributes) {
+                          RedirectAttributes redirectAttributes,
+                          HttpSession session) {
+        UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        if (user.getRole() == Role.STAFF) {
+            redirectAttributes.addFlashAttribute("error", "Nhân viên không thể đặt vé.");
+            return "redirect:/home";
+        }
+
         Integer showtimeId = parseIdOrNull(rawShowtimeId);
         if (showtimeId == null) {
             return "redirect:/home";
