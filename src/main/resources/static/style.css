@@ -1285,6 +1285,7 @@ input:-webkit-autofill:focus {
   background-color: transparent !important;
   border-bottom: 1px solid var(--border) !important;
   font-size: 14px;
+  color: var(--text-primary) !important;
 }
 
 .admin-sidebar {

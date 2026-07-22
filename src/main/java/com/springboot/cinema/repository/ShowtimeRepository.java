@@ -32,4 +32,7 @@ public interface ShowtimeRepository extends CrudRepository<Showtime, Integer> {
 
     @Query("SELECT COUNT(t) FROM Ticket t WHERE t.showtime.id = :showtimeId AND t.booking.bookingStatus <> 'CANCELLED'")
     long countActiveBookedTicketsByShowtimeId(@Param("showtimeId") int showtimeId);
+
+    @Query("SELECT COUNT(s) FROM Showtime s WHERE s.status = 'OPEN' AND s.startTime >= :now")
+    long countUpcomingOpenShowtimes(@Param("now") LocalDateTime now);
 }

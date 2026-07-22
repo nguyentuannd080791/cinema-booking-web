@@ -1,13 +1,20 @@
 package com.springboot.cinema.controller;
 
+import com.springboot.cinema.dto.TopMovieStatDTO;
 import com.springboot.cinema.dto.UserInformationDTO;
+import com.springboot.cinema.entity.Booking;
+import com.springboot.cinema.entity.BookingStatus;
 import com.springboot.cinema.entity.Movie;
+import com.springboot.cinema.entity.MovieStatus;
 import com.springboot.cinema.entity.Role;
 import com.springboot.cinema.entity.Room;
 import com.springboot.cinema.entity.Seat;
 import com.springboot.cinema.entity.Showtime;
 import com.springboot.cinema.entity.ShowtimeStatus;
 import com.springboot.cinema.repository.BookingRepository;
+import com.springboot.cinema.repository.CustomerRepository;
+import com.springboot.cinema.repository.ShowtimeRepository;
+import com.springboot.cinema.repository.TicketRepository;
 import com.springboot.cinema.service.CategoryService;
 import com.springboot.cinema.service.MovieService;
 import com.springboot.cinema.service.RoomService;
@@ -15,6 +22,7 @@ import com.springboot.cinema.service.SeatService;
 import com.springboot.cinema.service.ShowtimeService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +33,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -52,6 +63,15 @@ public class DashboardController {
     @Autowired
     private ShowtimeService showtimeService;
 
+    @Autowired
+    private TicketRepository ticketRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private ShowtimeRepository showtimeRepository;
+
     private boolean isNotAdmin(HttpSession session) {
         UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");
         return user == null || user.getRole() != Role.ADMIN;
@@ -63,14 +83,67 @@ public class DashboardController {
             return "redirect:/home";
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+
+        // Core KPIs
         BigDecimal revenue = bookingRepository.getTotalRevenue();
         if (revenue == null) {
             revenue = BigDecimal.ZERO;
         }
         long ticketCount = bookingRepository.getSoldTicketsCount();
+        BigDecimal revenueToday = bookingRepository.getRevenueSince(today.atStartOfDay());
 
         model.addAttribute("revenue", revenue);
         model.addAttribute("ticketCount", ticketCount);
+        model.addAttribute("revenueToday", revenueToday);
+
+        // Booking status breakdown
+        long paidBookings = bookingRepository.countByBookingStatus(BookingStatus.PAID);
+        long pendingBookings = bookingRepository.countByBookingStatus(BookingStatus.PENDING);
+        long cancelledBookings = bookingRepository.countByBookingStatus(BookingStatus.CANCELLED);
+        long totalBookings = paidBookings + pendingBookings + cancelledBookings;
+        model.addAttribute("paidBookings", paidBookings);
+        model.addAttribute("pendingBookings", pendingBookings);
+        model.addAttribute("cancelledBookings", cancelledBookings);
+        model.addAttribute("totalBookings", totalBookings);
+
+        // Catalog / capacity overview
+        List<Movie> allMovies = movieService.getAllMovies();
+        model.addAttribute("nowShowingCount", allMovies.stream()
+                .filter(m -> m.getStatus() == MovieStatus.NOWSHOWING).count());
+        model.addAttribute("comingSoonCount", allMovies.stream()
+                .filter(m -> m.getStatus() == MovieStatus.COMINGSOON).count());
+        model.addAttribute("roomCount", roomService.getAllRooms().size());
+        model.addAttribute("upcomingShowtimeCount", showtimeRepository.countUpcomingOpenShowtimes(now));
+        model.addAttribute("customerCount", customerRepository.count());
+
+        // Revenue trend for the last 7 days (PAID bookings)
+        LocalDate startDate = today.minusDays(6);
+        List<Booking> recentPaidBookings = bookingRepository.findPaidBookingsSince(startDate.atStartOfDay());
+        Map<LocalDate, BigDecimal> revenueByDate = recentPaidBookings.stream()
+                .collect(Collectors.groupingBy(
+                        b -> b.getBookingTime().toLocalDate(),
+                        Collectors.reducing(BigDecimal.ZERO, Booking::getTotalAmount, BigDecimal::add)));
+        DateTimeFormatter dayLabelFormatter = DateTimeFormatter.ofPattern("dd/MM");
+        List<String> revenueLabels = new ArrayList<>();
+        List<BigDecimal> revenueAmounts = new ArrayList<>();
+        for (int i = 0; i <= 6; i++) {
+            LocalDate date = startDate.plusDays(i);
+            revenueLabels.add(date.format(dayLabelFormatter));
+            revenueAmounts.add(revenueByDate.getOrDefault(date, BigDecimal.ZERO));
+        }
+        model.addAttribute("revenueLabels", revenueLabels);
+        model.addAttribute("revenueAmounts", revenueAmounts);
+
+        // Top 5 best-selling movies
+        List<TopMovieStatDTO> topMovies = ticketRepository.findTopSellingMovies(PageRequest.of(0, 5));
+        model.addAttribute("topMovies", topMovies);
+
+        // 8 most recent bookings
+        List<Booking> recentBookings = bookingRepository.findRecentBookings(PageRequest.of(0, 8));
+        model.addAttribute("recentBookings", recentBookings);
+
         return "dashboard";
     }
 
