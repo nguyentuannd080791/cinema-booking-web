@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineMax - Đăng Nhập</title>
-
+    <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -13,10 +13,11 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
-    <link rel="stylesheet" th:href="@{/style.css}" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="role-simulator.js"></script>
     <style>
       body {
-        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(43, 43, 43, 0.9)),
+        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(43, 43, 43, 0.9)), 
                     url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920&auto=format&fit=crop');
         background-size: cover;
         background-position: center;
@@ -40,35 +41,34 @@
     </style>
   </head>
   <body>
-
+    <!-- Navbar -->
     <nav class="navbar-cinemax">
       <div class="container d-flex align-items-center justify-content-between">
-        <a class="nav-brand" th:href="@{/home}">
+        <a class="nav-brand" href="home.html">
           <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
         </a>
         <div class="nav-actions">
-          <a th:href="@{/home}" class="btn-nav-ghost">Trang chủ</a>
+          <a href="home.html" class="btn-nav-ghost">Trang chủ</a>
         </div>
       </div>
     </nav>
 
     <div class="container login-container">
       <div class="login-card">
-        <h2 class="font-title text-center mb-4 text-white">Đăng Nhập</h2>
-
-        <form th:action="@{/login}" method="post">
-
+        <h2 class="font-title text-center mb-4">Đăng Nhập</h2>
+        
+        <form action="home.html" method="get">
+          <!-- Email Floating Input -->
           <div class="form-floating mb-3">
-            <input type="email" class="form-control auth-input bg-transparent text-white" id="floatingEmail" name="email" placeholder=" " th:value="${email}" required>
+            <input type="email" class="form-control auth-input bg-transparent" id="floatingEmail" placeholder="name@example.com" required>
             <label for="floatingEmail" class="text-white-50">Địa chỉ Email</label>
           </div>
 
+          <!-- Password Floating Input -->
           <div class="form-floating mb-4">
-            <input type="password" class="form-control auth-input bg-transparent text-white" id="floatingPassword" name="password" placeholder=" " required>
+            <input type="password" class="form-control auth-input bg-transparent" id="floatingPassword" placeholder="Password" required>
             <label for="floatingPassword" class="text-white-50">Mật khẩu</label>
-            <div class="text-danger mt-2" style="font-size: 0.85rem;" th:if="${error}">
-              <i class="bi bi-exclamation-circle me-1"></i><span th:text="${error}">Sai tài khoản hoặc mật khẩu</span>
-            </div>
+            <div class="text-danger mt-1" style="font-size: 0.85rem;"><i class="bi bi-exclamation-circle me-1"></i>Mẫu thông báo lỗi: Sai tài khoản hoặc mật khẩu</div>
           </div>
 
           <div class="mb-4 d-flex justify-content-between align-items-center">
@@ -79,15 +79,17 @@
             <a href="#" class="text-danger text-decoration-none" style="font-size: 0.9rem;">Quên mật khẩu?</a>
           </div>
 
+          <!-- Submit Button -->
           <button type="submit" class="btn btn-primary w-100 py-3 mb-3">Đăng Nhập</button>
-
+          
           <div class="text-center text-muted-custom mt-3">
-            Bạn chưa có tài khoản? <a th:href="@{/register}" class="text-danger text-decoration-none">Đăng ký ngay</a>
+            Bạn chưa có tài khoản? <a href="register.html" class="text-danger text-decoration-none">Đăng ký ngay</a>
           </div>
         </form>
       </div>
     </div>
 
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

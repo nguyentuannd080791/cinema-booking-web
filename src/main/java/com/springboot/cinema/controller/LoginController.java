@@ -39,8 +39,6 @@ public class LoginController {
             return "redirect:/login";
         }
 
-        // Đổi session ID để chống session fixation, nhưng vẫn giữ lại dữ liệu chọn ghế đang chờ (nếu có).
-        // changeSessionId() thuộc HttpServletRequest, không phải HttpSession.
         request.changeSessionId();
         session.setAttribute("user", userInformationDTO);
 

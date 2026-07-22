@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineMax - Xác Nhận Đặt Vé</title>
-    <!-- Bootstrap CSS -->
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -38,7 +38,7 @@
     </style>
   </head>
   <body>
-    <!-- Navbar -->
+
     <nav class="navbar-cinemax">
       <div class="container d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
@@ -52,7 +52,7 @@
 
     <div class="container my-5">
       <div class="row g-4">
-        <!-- Cột Trái: Thông tin đặt vé -->
+
         <div class="col-lg-7">
           <div class="receipt-card mb-4">
             <h4 class="font-title mb-4 border-start border-danger border-4 ps-3">Thông Tin Lịch Chiếu</h4>
@@ -65,12 +65,12 @@
                 <p class="mb-1 text-muted-custom"><i class="bi bi-geo-alt-fill text-danger me-2"></i><strong>Rạp:</strong> CineMax Center</p>
                 <p class="mb-1 text-muted-custom"><i class="bi bi-door-open-fill text-danger me-2"></i><strong>Phòng chiếu:</strong> <span th:text="${showtime.room.roomName}">Cinema Hall 1</span></p>
                 <p class="mb-3 text-muted-custom"><i class="bi bi-clock-fill text-danger me-2"></i><strong>Thời gian:</strong> <span th:text="${#temporals.format(showtime.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(showtime.startTime, 'dd/MM/yyyy')}">19:00 - Thứ Hai, 13/07/2026</span></p>
-                
+
                 <h5 class="font-title text-white mb-2">Ghế đã chọn</h5>
                 <div>
-                  <!-- Trạng thái 1: chưa có booking, hiển thị ghế từ selectedSeatList -->
+
                   <span th:if="${payment == null}" th:each="seat : ${selectedSeatList}" class="seat-tag" th:text="${seat.seatNumber} + ' (' + ${seat.seatType} + ')'">D5 (VIP)</span>
-                  <!-- Trạng thái 2: đã có booking, hiển thị ghế từ booking.ticketList -->
+
                   <span th:if="${payment != null}" th:each="ticket : ${booking.ticketList}" class="seat-tag" th:text="${ticket.seat.seatNumber} + ' (' + ${ticket.seat.seatType} + ')'">D5 (VIP)</span>
                 </div>
               </div>
@@ -78,11 +78,9 @@
           </div>
         </div>
 
-        <!-- Cột Phải: Hóa đơn & Thanh toán -->
         <div class="col-lg-5">
           <div class="receipt-card">
 
-            <!-- ===================== TRẠNG THÁI 1: XÁC NHẬN GIỮ GHẾ (chưa có bookingId) ===================== -->
             <div th:if="${payment == null}">
               <h4 class="font-title mb-4 border-start border-danger border-4 ps-3">Hóa Đơn Chi Tiết</h4>
 
@@ -106,7 +104,6 @@
                 <span class="text-danger font-title h2 mb-0" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">240.000 đ</span>
               </div>
 
-              <!-- Action buttons -->
               <div class="d-grid gap-2">
                 <form th:action="@{/confirm-booking/create}" method="post">
                   <button type="submit" class="btn btn-primary btn-lg py-3 btn-pulse text-uppercase font-title fs-6 w-100"><i class="bi bi-check-circle-fill me-2"></i>Xác nhận giữ ghế</button>
@@ -115,7 +112,6 @@
               </div>
             </div>
 
-            <!-- ===================== TRẠNG THÁI 2: THANH TOÁN (đã có bookingId) ===================== -->
             <div th:if="${payment != null}">
               <h4 class="font-title mb-4 border-start border-danger border-4 ps-3">Thanh Toán</h4>
 
@@ -129,7 +125,6 @@
                 <span class="text-danger font-title h2 mb-0" th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">240.000 đ</span>
               </div>
 
-              <!-- Action buttons -->
               <div class="d-grid gap-2">
                 <form th:action="@{/payment/confirm}" method="post">
                   <input type="hidden" name="transactionReference" th:value="${payment.transactionReference}" />
@@ -146,7 +141,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer-cine">
       <div class="container">
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 2rem; flex-wrap: wrap;">
@@ -196,7 +190,6 @@
       </div>
     </footer>
 
-    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

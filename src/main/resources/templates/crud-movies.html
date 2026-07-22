@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineMax Admin - Quản lý Phim</title>
-    <!-- Bootstrap CSS -->
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -16,7 +16,7 @@
     <link rel="stylesheet" th:href="@{/style.css}" />
   </head>
   <body>
-    <!-- Navbar -->
+
     <nav class="navbar-cinemax">
       <div class="container d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
@@ -31,10 +31,9 @@
       </div>
     </nav>
 
-    <!-- Main Layout Grid -->
     <div class="container-fluid px-0">
       <div class="row g-0">
-        <!-- Sidebar -->
+
         <div class="col-md-3 col-lg-2 admin-sidebar">
           <div class="py-4">
             <a th:href="@{/admin/dashboard}" class="sidebar-link">
@@ -49,12 +48,14 @@
             <a th:href="@{/admin/seats}" class="sidebar-link">
               <i class="bi bi-grid-3x3"></i> Quản lý Ghế
             </a>
+            <a th:href="@{/admin/showtimes}" class="sidebar-link">
+              <i class="bi bi-calendar-event"></i> Quản lý Lịch chiếu
+            </a>
           </div>
         </div>
 
-        <!-- Main Content -->
         <div class="col-md-9 col-lg-10 p-4">
-          <!-- Success/Error Alerts -->
+
           <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             <span th:text="${success}">Thành công</span>
@@ -73,7 +74,6 @@
             </button>
           </div>
 
-          <!-- Movies Table -->
           <div class="admin-card py-2 text-white">
             <div class="table-responsive">
               <table class="table admin-table table-hover align-middle m-0">
@@ -94,8 +94,8 @@
                       <img th:src="${movie.posterURL}" class="rounded" style="width: 50px; height: 70px; object-fit: cover;" th:alt="${movie.title}" />
                     </td>
                     <td><strong class="text-white" th:text="${movie.title}">Avatar: Dòng Chảy Của Nước</strong></td>
-                    <td th:text="${movie.categoryList != null && !movie.categoryList.isEmpty() ? #strings.listJoin(movie.categoryList.![categoryName], ', ') : 'Không có'}">Hành động, Khoa học viễn tưởng</td>
-                    <td th:text="${movie.duration} + ' phút'">192 phút</td>
+                    <td class="text-white" th:text="${movie.categoryList != null && !movie.categoryList.isEmpty() ? #strings.listJoin(movie.categoryList.![categoryName], ', ') : 'Không có'}">Hành động, Khoa học viễn tưởng</td>
+                    <td class="text-white" th:text="${movie.duration} + ' phút'">192 phút</td>
                     <td><span class="badge bg-danger" th:text="${movie.ageRating}">C13</span></td>
                     <td>
                       <span th:class="'badge ' + (${movie.status.name() == 'NOWSHOWING'} ? 'bg-success' : (${movie.status.name() == 'COMINGSOON'} ? 'bg-warning text-dark' : 'bg-secondary'))"
@@ -116,7 +116,6 @@
       </div>
     </div>
 
-    <!-- Add Movie Modal -->
     <div class="modal fade" id="addMovieModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white border-secondary">
@@ -150,6 +149,16 @@
                 <input type="text" class="form-control form-cine-dark text-white" name="language" placeholder="Tiếng Việt, Phụ đề..." />
               </div>
               <div>
+                <label class="form-label text-white-50">Thể loại</label>
+                <div class="d-flex flex-wrap gap-3 p-2" style="max-height: 160px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;">
+                  <div class="form-check" th:each="category : ${categories}">
+                    <input class="form-check-input" type="checkbox" name="categoryIds" th:value="${category.id}" th:id="'addCat-' + ${category.id}" />
+                    <label class="form-check-label text-white-50" th:for="'addCat-' + ${category.id}" th:text="${category.categoryName}"></label>
+                  </div>
+                  <span class="text-white-50" th:if="${categories == null || categories.isEmpty()}">Chưa có thể loại nào trong hệ thống.</span>
+                </div>
+              </div>
+              <div>
                 <label class="form-label text-white-50">Ngày khởi chiếu</label>
                 <input type="date" class="form-control form-cine-dark text-white" name="releaseDate" />
               </div>
@@ -179,7 +188,6 @@
       </div>
     </div>
 
-    <!-- Edit Movie Modals -->
     <div th:each="movie : ${movies}" class="modal fade" th:id="'editMovieModal-' + ${movie.id}" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white border-secondary">
@@ -214,6 +222,18 @@
                 <input type="text" class="form-control form-cine-dark text-white" name="language" th:value="${movie.language}" />
               </div>
               <div>
+                <label class="form-label text-white-50">Thể loại</label>
+                <div class="d-flex flex-wrap gap-3 p-2" style="max-height: 160px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;">
+                  <div class="form-check" th:each="category : ${categories}">
+                    <input class="form-check-input" type="checkbox" name="categoryIds" th:value="${category.id}"
+                           th:id="'editCat-' + ${movie.id} + '-' + ${category.id}"
+                           th:checked="${movie.categoryList != null && movie.categoryList.contains(category)}" />
+                    <label class="form-check-label text-white-50" th:for="'editCat-' + ${movie.id} + '-' + ${category.id}" th:text="${category.categoryName}"></label>
+                  </div>
+                  <span class="text-white-50" th:if="${categories == null || categories.isEmpty()}">Chưa có thể loại nào trong hệ thống.</span>
+                </div>
+              </div>
+              <div>
                 <label class="form-label text-white-50">Ngày khởi chiếu</label>
                 <input type="date" class="form-control form-cine-dark text-white" name="releaseDate" th:value="${#temporals.format(movie.releaseDate, 'yyyy-MM-dd')}" />
               </div>
@@ -243,7 +263,6 @@
       </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

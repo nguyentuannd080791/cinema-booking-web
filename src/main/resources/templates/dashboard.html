@@ -1,98 +1,398 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CineMax Admin - Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
-    <link rel="stylesheet" th:href="@{/style.css}" />
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar-cinemax">
-      <div class="container d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-          <a class="nav-brand me-4" th:href="@{/home}">
-            <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineMax Admin - Dashboard</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" th:href="@{/style.css}" />
+  <style>
+    .mini-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      height: 100%;
+      transition: border-color var(--dur-base);
+    }
+
+    .mini-stat-card:hover {
+      border-color: var(--border-hover);
+    }
+
+    .mini-stat-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .mini-stat-value {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .mini-stat-label {
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+    }
+
+    .status-bar-track {
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+      height: 10px;
+      display: flex;
+    }
+
+    .top-movie-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-movie-row:last-child {
+      border-bottom: none;
+    }
+
+    .top-movie-rank {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      width: 22px;
+      text-align: center;
+    }
+
+    .top-movie-poster {
+      width: 40px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar-cinemax">
+    <div class="container d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+        <a class="nav-brand me-4" th:href="@{/home}">
+          <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+        </a>
+        <span class="badge bg-warning text-dark font-title px-2 py-1 fs-6">ADMIN PORTAL</span>
+      </div>
+      <div class="nav-actions">
+        <a th:href="@{/home}" class="btn-nav-ghost"><i class="bi bi-box-arrow-left me-1"></i>Thoát</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-0">
+    <div class="row g-0">
+
+      <div class="col-md-3 col-lg-2 admin-sidebar">
+        <div class="py-4">
+          <a th:href="@{/admin/dashboard}" class="sidebar-link active">
+            <i class="bi bi-speedometer2"></i> Tổng quan
           </a>
-          <span class="badge bg-warning text-dark font-title px-2 py-1 fs-6">ADMIN PORTAL</span>
-        </div>
-        <div class="nav-actions">
-          <a th:href="@{/home}" class="btn-nav-ghost"><i class="bi bi-box-arrow-left me-1"></i>Thoát</a>
+          <a th:href="@{/admin/movies}" class="sidebar-link">
+            <i class="bi bi-film"></i> Quản lý Phim
+          </a>
+          <a th:href="@{/admin/rooms}" class="sidebar-link">
+            <i class="bi bi-door-open"></i> Quản lý Phòng
+          </a>
+          <a th:href="@{/admin/seats}" class="sidebar-link">
+            <i class="bi bi-grid-3x3"></i> Quản lý Ghế
+          </a>
+          <a th:href="@{/admin/showtimes}" class="sidebar-link">
+            <i class="bi bi-calendar-event"></i> Quản lý Lịch chiếu
+          </a>
         </div>
       </div>
-    </nav>
 
-    <!-- Main Layout Grid -->
-    <div class="container-fluid px-0">
-      <div class="row g-0">
-        <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 admin-sidebar">
-          <div class="py-4">
-            <a th:href="@{/admin/dashboard}" class="sidebar-link active">
-              <i class="bi bi-speedometer2"></i> Tổng quan
-            </a>
-            <a th:href="@{/admin/movies}" class="sidebar-link">
-              <i class="bi bi-film"></i> Quản lý Phim
-            </a>
-            <a th:href="@{/admin/rooms}" class="sidebar-link">
-              <i class="bi bi-door-open"></i> Quản lý Phòng
-            </a>
-            <a th:href="@{/admin/seats}" class="sidebar-link">
-              <i class="bi bi-grid-3x3"></i> Quản lý Ghế
-            </a>
+      <div class="col-md-9 col-lg-10 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="font-title mb-0 border-start border-danger border-4 ps-3 text-white">Bảng Điều Khiển Hệ Thống</h2>
+          <div class="text-white-50"><i class="bi bi-calendar3 me-2"></i>Hệ thống quản lý thời gian thực</div>
+        </div>
+
+        <!-- Primary KPI cards -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6 col-lg-6">
+            <div class="admin-card">
+              <span class="text-white-50 fs-6 d-block mb-1">Doanh Thu Tổng (PAID)</span>
+              <div class="stat-value text-danger"
+                th:text="${#numbers.formatDecimal(revenue, 0, 'COMMA', 0, 'POINT')} + ' đ'">24,500,000 đ</div>
+              <small class="text-success"><i class="bi bi-shield-check"></i> Đã thanh toán thực tế</small>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-6">
+            <div class="admin-card">
+              <span class="text-white-50 fs-6 d-block mb-1">Vé Đã Bán Ra</span>
+              <div class="stat-value text-warning" th:text="${ticketCount} + ' vé'">248 vé</div>
+              <small class="text-success"><i class="bi bi-ticket-perforated"></i> Bao gồm cả vé soát và vé quầy</small>
+            </div>
           </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="col-md-9 col-lg-10 p-4">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="font-title mb-0 border-start border-danger border-4 ps-3 text-white">Bảng Điều Khiển Hệ Thống</h2>
-            <div class="text-white-50"><i class="bi bi-calendar3 me-2"></i>Hệ thống quản lý thời gian thực</div>
-          </div>
-
-          <!-- Stats Grid -->
-          <div class="row g-3 mb-4">
-            <div class="col-md-6 col-lg-6">
-              <div class="admin-card">
-                <span class="text-white-50 fs-6 d-block mb-1">Doanh Thu Tổng (PAID)</span>
-                <div class="stat-value text-danger" th:text="${#numbers.formatDecimal(revenue, 0, 'COMMA', 0, 'POINT')} + ' đ'">24,500,000 đ</div>
-                <small class="text-success"><i class="bi bi-shield-check"></i> Đã thanh toán thực tế</small>
+        <!-- Secondary mini-stat cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="mini-stat-card">
+              <div class="mini-stat-icon" style="background: var(--success-dim); color: var(--success);">
+                <i class="bi bi-cash-coin"></i>
               </div>
-            </div>
-            <div class="col-md-6 col-lg-6">
-              <div class="admin-card">
-                <span class="text-white-50 fs-6 d-block mb-1">Vé Đã Bán Ra</span>
-                <div class="stat-value text-warning" th:text="${ticketCount} + ' vé'">248 vé</div>
-                <small class="text-success"><i class="bi bi-ticket-perforated"></i> Bao gồm cả vé soát và vé quầy</small>
+              <div>
+                <div class="mini-stat-value" th:text="${#numbers.formatDecimal(revenueToday, 0, 'COMMA', 0, 'POINT')}">0
+                </div>
+                <div class="mini-stat-label">Doanh thu hôm nay (đ)</div>
               </div>
             </div>
           </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="mini-stat-card">
+              <div class="mini-stat-icon" style="background: var(--accent-dim); color: var(--accent);">
+                <i class="bi bi-film"></i>
+              </div>
+              <div>
+                <div class="mini-stat-value" th:text="${nowShowingCount}">0</div>
+                <div class="mini-stat-label">Phim đang chiếu</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="mini-stat-card">
+              <div class="mini-stat-icon" style="background: var(--warning-dim); color: var(--warning);">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+              <div>
+                <div class="mini-stat-value" th:text="${comingSoonCount}">0</div>
+                <div class="mini-stat-label">Phim sắp chiếu</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="mini-stat-card">
+              <div class="mini-stat-icon" style="background: rgba(255,255,255,0.06); color: var(--text-primary);">
+                <i class="bi bi-door-open"></i>
+              </div>
+              <div>
+                <div class="mini-stat-value" th:text="${roomCount}">0</div>
+                <div class="mini-stat-label">Phòng chiếu</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="mini-stat-card">
+              <div class="mini-stat-icon" style="background: var(--success-dim); color: var(--success);">
+                <i class="bi bi-calendar-check"></i>
+              </div>
+              <div>
+                <div class="mini-stat-value" th:text="${upcomingShowtimeCount}">0</div>
+                <div class="mini-stat-label">Suất chiếu sắp tới</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="mini-stat-card">
+              <div class="mini-stat-icon" style="background: rgba(255,255,255,0.06); color: var(--text-primary);">
+                <i class="bi bi-people"></i>
+              </div>
+              <div>
+                <div class="mini-stat-value" th:text="${customerCount}">0</div>
+                <div class="mini-stat-label">Khách hàng</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <!-- Content Row -->
-          <div class="row g-4">
-            <div class="col-lg-12">
-              <div class="admin-card">
-                <h4 class="font-title mb-3 text-white">Chào mừng quay trở lại, Admin!</h4>
-                <p class="text-muted-custom">
-                  Sử dụng thanh công cụ bên trái để quản lý danh sách phim đang chiếu, thêm phòng chiếu mới, hoặc quản lý cấu hình các loại ghế trong rạp. Mọi thao tác ghi/xóa dữ liệu đều được lưu trực tiếp vào cơ sở dữ liệu hệ thống.
-                </p>
+        <div class="row g-4 mb-4">
+          <!-- Revenue trend chart -->
+          <div class="col-lg-7">
+            <div class="admin-card h-100">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="section-heading">Doanh Thu 7 Ngày Gần Nhất</span>
+                <i class="bi bi-graph-up-arrow text-danger"></i>
+              </div>
+              <canvas id="revenueChart" height="140"></canvas>
+            </div>
+          </div>
+
+          <!-- Booking status breakdown -->
+          <div class="col-lg-5">
+            <div class="admin-card h-100">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="section-heading">Trạng Thái Đơn Hàng</span>
+                <i class="bi bi-receipt text-danger"></i>
+              </div>
+
+              <div class="status-bar-track mb-3" th:if="${totalBookings > 0}">
+                <div th:style="'background: var(--success); width: ' + ${paidBookings * 100 / totalBookings} + '%'">
+                </div>
+                <div th:style="'background: var(--warning); width: ' + ${pendingBookings * 100 / totalBookings} + '%'">
+                </div>
+                <div th:style="'background: var(--accent); width: ' + ${cancelledBookings * 100 / totalBookings} + '%'">
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center py-2"
+                style="border-bottom: 1px solid var(--border);">
+                <span class="text-white-50"><i class="bi bi-circle-fill me-2"
+                    style="color: var(--success); font-size: 8px;"></i>Đã thanh toán</span>
+                <span class="fw-bold text-white" th:text="${paidBookings}">0</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center py-2"
+                style="border-bottom: 1px solid var(--border);">
+                <span class="text-white-50"><i class="bi bi-circle-fill me-2"
+                    style="color: var(--warning); font-size: 8px;"></i>Đang chờ</span>
+                <span class="fw-bold text-white" th:text="${pendingBookings}">0</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center py-2">
+                <span class="text-white-50"><i class="bi bi-circle-fill me-2"
+                    style="color: var(--accent); font-size: 8px;"></i>Đã hủy</span>
+                <span class="fw-bold text-white" th:text="${cancelledBookings}">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Top selling movies -->
+          <div class="col-lg-5">
+            <div class="admin-card h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="section-heading">Phim Bán Chạy Nhất</span>
+                <i class="bi bi-trophy text-danger"></i>
+              </div>
+              <div th:if="${#lists.isEmpty(topMovies)}" class="text-muted-custom py-3">Chưa có dữ liệu bán vé.</div>
+              <div th:each="movie, iter : ${topMovies}" class="top-movie-row">
+                <span class="top-movie-rank" th:text="${iter.count}">1</span>
+                <img class="top-movie-poster" th:src="${movie.posterURL}" alt="poster"
+                  onerror="this.style.visibility='hidden'" />
+                <div class="flex-grow-1">
+                  <div class="text-white fw-semibold" th:text="${movie.title}">Tên phim</div>
+                  <small class="text-white-50" th:text="${movie.ticketsSold} + ' vé'">0 vé</small>
+                </div>
+                <div class="text-danger fw-bold text-end"
+                  th:text="${#numbers.formatDecimal(movie.revenue, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent bookings -->
+          <div class="col-lg-7">
+            <div class="admin-card h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="section-heading">Đơn Hàng Gần Đây</span>
+                <i class="bi bi-clock-history text-danger"></i>
+              </div>
+              <div class="table-responsive">
+                <table class="table admin-table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Khách hàng</th>
+                      <th>Phim</th>
+                      <th>Thời gian</th>
+                      <th>Số tiền</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:if="${#lists.isEmpty(recentBookings)}">
+                      <td colspan="5" class="text-muted-custom text-center py-3">Chưa có đơn hàng nào.</td>
+                    </tr>
+                    <tr th:each="booking : ${recentBookings}">
+                      <td
+                        th:text="${booking.customer != null ? booking.customer.user.fullName : (booking.staff != null ? booking.staff.user.fullName + ' (Quầy)' : '-')}">
+                        Khách hàng</td>
+                      <td
+                        th:text="${(booking.ticketList != null and !#lists.isEmpty(booking.ticketList)) ? booking.ticketList[0].showtime.movie.title : '-'}">
+                        Tên phim</td>
+                      <td th:text="${#temporals.format(booking.bookingTime, 'HH:mm dd/MM')}">--:--</td>
+                      <td th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ
+                      </td>
+                      <td>
+                        <span th:if="${booking.bookingStatus.name() == 'PAID'}" class="badge"
+                          style="background: var(--success-dim); color: var(--success);">Đã thanh toán</span>
+                        <span th:if="${booking.bookingStatus.name() == 'PENDING'}" class="badge"
+                          style="background: var(--warning-dim); color: var(--warning);">Đang chờ</span>
+                        <span th:if="${booking.bookingStatus.name() == 'CANCELLED'}" class="badge"
+                          style="background: var(--accent-dim); color: var(--accent);">Đã hủy</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script th:inline="javascript">
+    const revenueLabels = /*[[${revenueLabels}]]*/[];
+    const revenueAmounts = /*[[${revenueAmounts}]]*/[];
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: revenueLabels,
+        datasets: [{
+          label: 'Doanh thu (đ)',
+          data: revenueAmounts,
+          backgroundColor: 'rgba(229, 9, 20, 0.55)',
+          borderColor: '#E50914',
+          borderWidth: 1,
+          borderRadius: 4,
+          maxBarThickness: 40
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#A3A3A3' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          y: {
+            ticks: {
+              color: '#A3A3A3',
+              callback: function (value) { return new Intl.NumberFormat('vi-VN').format(value); }
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+
 </html>

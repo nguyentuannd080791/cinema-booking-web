@@ -48,7 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private String generateTransactionReference() {
-        // UUID + a secure-random suffix, not an incrementing id, so references cannot be guessed/enumerated.
+
         return UUID.randomUUID().toString().replace("-", "") + Long.toHexString(SECURE_RANDOM.nextLong());
     }
 
@@ -58,7 +58,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = getOwnedPayment(transactionReference, requestingUserId);
 
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
-            // Idempotent: safe to call repeatedly (e.g. webhook retries).
+
             return payment;
         }
         if (payment.getStatus() != PaymentStatus.PENDING) {
@@ -126,11 +126,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    /**
-     * Shared release logic used by both explicit cancellation and the expired-booking cleanup job:
-     * mark the booking as CANCELLED and delete its Ticket rows outright (not just flag them INVALID),
-     * since the (showtime_id, seat_id) unique constraint would otherwise still block re-booking the same seat.
-     */
     private void releaseBooking(Booking booking, BookingStatus newStatus) {
         booking.setBookingStatus(newStatus);
         bookingRepository.save(booking);

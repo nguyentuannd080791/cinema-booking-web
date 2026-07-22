@@ -1,7 +1,9 @@
 package com.springboot.cinema.service.impl;
 
+import com.springboot.cinema.entity.Category;
 import com.springboot.cinema.entity.Movie;
 import com.springboot.cinema.entity.MovieStatus;
+import com.springboot.cinema.repository.CategoryRepository;
 import com.springboot.cinema.repository.MovieRepository;
 import com.springboot.cinema.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ import java.util.List;
 public class MovieServiceImpl implements MovieService {
     @Autowired
     private MovieRepository movieRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public MovieServiceImpl(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
@@ -52,7 +57,30 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional
-    public Movie saveMovie(Movie movie) {
+    public Movie saveMovie(Movie movie, List<Integer> categoryIds) {
+        List<Category> categories = new ArrayList<>();
+        if (categoryIds != null) {
+            for (Integer categoryId : categoryIds) {
+                categoryRepository.findById(categoryId).ifPresent(categories::add);
+            }
+        }
+
+        if (movie.getId() != 0) {
+            Movie existing = movieRepository.findById(movie.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Phim không tồn tại."));
+            existing.setTitle(movie.getTitle());
+            existing.setDuration(movie.getDuration());
+            existing.setReleaseDate(movie.getReleaseDate());
+            existing.setDescription(movie.getDescription());
+            existing.setPosterURL(movie.getPosterURL());
+            existing.setLanguage(movie.getLanguage());
+            existing.setAgeRating(movie.getAgeRating());
+            existing.setStatus(movie.getStatus());
+            existing.setCategoryList(categories);
+            return movieRepository.save(existing);
+        }
+
+        movie.setCategoryList(categories);
         return movieRepository.save(movie);
     }
 

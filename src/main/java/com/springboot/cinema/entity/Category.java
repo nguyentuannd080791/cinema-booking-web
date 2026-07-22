@@ -3,6 +3,7 @@ package com.springboot.cinema.entity;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Category {
@@ -46,5 +47,18 @@ public class Category {
 
     public void setMovieList(List<Movie> movieList) {
         this.movieList = movieList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Category)) return false;
+        Category category = (Category) o;
+        return id == category.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

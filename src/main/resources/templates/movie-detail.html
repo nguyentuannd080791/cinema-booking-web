@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineMax - Chi Tiết Phim</title>
-    <!-- Bootstrap CSS -->
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -57,24 +57,183 @@
         border-color: var(--accent, #E50914);
         transform: translateY(-2px);
       }
+      /* Staff Area Modernization styles */
       .staff-showtime-box {
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px dashed rgba(255, 255, 255, 0.1);
+        background: radial-gradient(circle at 10% 10%, rgba(245, 158, 11, 0.06) 0%, rgba(20, 20, 20, 0.95) 70%);
+        border: 1px solid rgba(245, 158, 11, 0.18);
+        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(245, 158, 11, 0.02);
+        border-radius: 16px;
+        padding: 2.2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .staff-showtime-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--warning);
+      }
+      .staff-header {
+        font-family: var(--font-display);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+      }
+      .staff-header span {
+        font-weight: 200;
+        font-size: 0.85rem;
+        letter-spacing: 0.15em;
+        color: var(--text-secondary);
+        display: block;
+        margin-top: 6px;
+      }
+      .bg-warning-dim {
+        background-color: var(--warning-dim);
+      }
+      .staff-card-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+        margin-top: 1.5rem;
+      }
+      .staff-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 1.25rem 1.75rem;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 2rem;
+        transition: all 0.35s var(--ease);
+      }
+      .staff-card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(245, 158, 11, 0.35);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(245, 158, 11, 0.05);
+      }
+      .staff-time-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        padding-right: 2rem;
+        min-width: 100px;
+      }
+      .staff-time {
+        font-family: var(--font-body);
+        font-weight: 800;
+        font-size: 1.75rem;
+        color: var(--warning);
+        line-height: 1;
+        letter-spacing: -0.01em;
+      }
+      .staff-time-label {
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+        margin-top: 6px;
+      }
+      .staff-room-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .staff-room-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: rgba(245, 158, 11, 0.08);
+        color: var(--warning);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        border: 1px solid rgba(245, 158, 11, 0.15);
+      }
+      .staff-room-name {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        letter-spacing: -0.01em;
+      }
+      .staff-room-type {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        display: block;
+        margin-top: 3px;
+      }
+      .staff-actions {
+        display: flex;
+        gap: 0.85rem;
+      }
+      .btn-staff-action {
+        font-weight: 600;
+        font-size: 0.88rem;
+        padding: 0.7rem 1.4rem;
         border-radius: 8px;
-        padding: 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        transition: all 0.25s var(--ease);
+        text-decoration: none;
+      }
+      .btn-staff-checkin {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .btn-staff-checkin:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+      .btn-staff-walkin {
+        background: var(--warning);
+        color: #000;
+        border: 1px solid var(--warning);
+      }
+      .btn-staff-walkin:hover {
+        background: #fbbf24;
+        border-color: #fbbf24;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+      }
+      @media (max-width: 768px) {
+        .staff-card {
+          grid-template-columns: 1fr;
+          gap: 1.25rem;
+          padding: 1.25rem;
+        }
+        .staff-time-section {
+          border-right: none;
+          padding-right: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          padding-bottom: 0.75rem;
+        }
+        .staff-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Navbar -->
+
     <nav class="navbar-cinemax">
       <div class="container d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
           <a class="nav-brand me-4" th:href="@{/home}">
             <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
           </a>
-          
-          <!-- Admin Navigation Links (only shown when role is admin) -->
+
           <div class="d-none d-lg-flex align-items-center gap-3" th:if="${user != null && user.role.name() == 'ADMIN'}">
             <a th:href="@{/admin/dashboard}" class="text-white text-decoration-none fw-bold fs-6"><i class="bi bi-speedometer2 me-1 text-warning"></i>Dashboard</a>
             <a th:href="@{/admin/movies}" class="text-white-50 text-decoration-none fw-bold fs-6"><i class="bi bi-film me-1"></i>Phim</a>
@@ -84,12 +243,12 @@
         </div>
 
         <div class="nav-actions">
-          <!-- Chưa đăng nhập -->
+
           <span th:if="${user == null}">
             <a th:href="@{/login}" class="btn-nav-ghost">Đăng nhập</a>
             <a th:href="@{/register}" class="btn-nav-primary">Đăng ký</a>
           </span>
-          <!-- Đã đăng nhập -->
+
           <span th:unless="${user == null}" class="d-flex align-items-center gap-3">
             <span class="text-white-50 fs-6">
               Xin chào, <strong class="text-white" th:text="${user.fullName}">Khách</strong>
@@ -104,25 +263,22 @@
       </div>
     </nav>
 
-    <!-- Backdrop Image Section -->
     <div class="backdrop-section" th:style="'background-image: linear-gradient(to bottom, rgba(20, 20, 20, 0.2) 0%, rgba(20, 20, 20, 1) 100%), url(\'' + ${movie.posterURL} + '\');'"></div>
 
-    <!-- Main Detail Container -->
     <div class="container detail-container mb-5">
       <div class="row g-4">
-        <!-- Poster & Trailer Button -->
+
         <div class="col-md-4 col-lg-3">
           <img th:src="${movie.posterURL}" th:alt="${movie.title}" class="movie-detail-poster mb-3" />
           <button class="btn btn-outline-light w-100 py-2 btn-trailer" style="border-radius: 4px;"><i class="bi bi-play-fill me-2"></i>Xem Trailer</button>
         </div>
 
-        <!-- Movie Information -->
         <div class="col-md-8 col-lg-9 text-white d-flex flex-column justify-content-end">
           <div class="mb-3">
             <span class="badge bg-danger p-2 mb-2 font-title" th:text="${movie.ageRating}">C13</span>
           </div>
           <h1 class="display-4 font-title mb-2" th:text="${movie.title}">Avatar: Dòng Chảy Của Nước</h1>
-          
+
           <div class="d-flex flex-wrap mb-4 text-muted-custom">
             <span class="dot-separator" th:text="${movie.categoryList != null && !movie.categoryList.isEmpty() ? #strings.listJoin(movie.categoryList.![categoryName], ', ') : 'Chưa có thể loại'}">Hành động, Khoa học viễn tưởng</span>
             <span class="dot-separator"><span th:text="${movie.duration}">192</span> phút</span>
@@ -138,15 +294,13 @@
 
       <hr class="border-secondary my-5" />
 
-      <!-- Showtime Section for Customers -->
       <div class="mb-5">
         <h3 class="font-title mb-4 border-start border-danger border-4 ps-3 text-white">Lịch Chiếu Phim (Khách Hàng)</h3>
-        
-        <!-- Date Selector Bar -->
+
         <div class="d-flex gap-2 overflow-auto pb-3 mb-4" style="scrollbar-width: thin;" th:if="${showtimeDates != null && !showtimeDates.isEmpty()}">
-          <a th:each="d : ${showtimeDates}" 
+          <a th:each="d : ${showtimeDates}"
              th:href="@{/movie/{id}(id=${movie.id}, date=${d})}"
-             class="btn px-4 py-2 text-start text-decoration-none" 
+             class="btn px-4 py-2 text-start text-decoration-none"
              th:classappend="${d.isEqual(selectedDate)} ? 'btn-outline-danger active' : 'btn-outline-secondary text-white-50'"
              style="min-width: 140px; border-radius: 8px;">
             <span class="d-block small" th:text="${d.isEqual(T(java.time.LocalDate).now()) ? 'Hôm nay' : (d.isEqual(T(java.time.LocalDate).now().plusDays(1)) ? 'Ngày mai' : (d.getDayOfWeek().name() == 'SUNDAY' ? 'Chủ Nhật' : 'Thứ ' + (d.getDayOfWeek().getValue() + 1)))}">Hôm nay</span>
@@ -154,7 +308,6 @@
           </a>
         </div>
 
-        <!-- Rooms & Formats Grid -->
         <div class="d-flex flex-column gap-4" th:if="${showtimesByRoom != null && !showtimesByRoom.isEmpty()}">
           <div th:each="entry : ${showtimesByRoom}" class="bg-card p-4 rounded-3 border border-secondary border-opacity-20">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -165,9 +318,9 @@
               <span class="badge bg-secondary">Chuẩn 2D</span>
             </div>
             <div class="d-flex flex-wrap gap-3">
-              <a th:each="showtime : ${entry.value}" 
-                 th:href="@{/showtime/{id}(id=${showtime.id})}" 
-                 class="showtime-btn text-center py-2 px-4" 
+              <a th:each="showtime : ${entry.value}"
+                 th:href="@{/showtime/{id}(id=${showtime.id})}"
+                 class="showtime-btn text-center py-2 px-4"
                  th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">09:00</a>
             </div>
           </div>
@@ -179,36 +332,47 @@
         </div>
       </div>
 
-      <!-- Showtime Section for Staff -->
-      <div class="staff-showtime-box mb-5" th:if="${user != null && (user.role.name() == 'STAFF' || user.role.name() == 'ADMIN') && showtimesByRoom != null && !showtimesByRoom.isEmpty()}">
-        <h4 class="font-title mb-3 text-warning"><i class="bi bi-shield-lock-fill me-2"></i>Khu Vực Nghiệp Vụ Nhân Viên (STAFF ONLY)</h4>
-        <div class="table-responsive">
-          <table class="table table-dark table-hover align-middle border-secondary m-0">
-            <thead>
-              <tr>
-                <th>Giờ Chiếu</th>
-                <th>Phòng</th>
-                <th class="text-end">Tác vụ nghiệp vụ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <th:block th:each="entry : ${showtimesByRoom}">
-                <tr th:each="showtime : ${entry.value}">
-                  <td><strong th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">09:00</strong></td>
-                  <td th:text="${entry.key.roomName}">Cinema Hall 1</td>
-                  <td class="text-end">
-                    <a th:href="@{/staff/showtime/{id}/check-in(id=${showtime.id})}" class="btn btn-secondary btn-sm me-2 px-3"><i class="bi bi-qr-code-scan me-1"></i>Check-in</a>
-                    <a th:href="@{/staff/showtime/{id}/walk-in(id=${showtime.id})}" class="btn btn-primary btn-sm px-3"><i class="bi bi-person-plus-fill me-1"></i>Walk-in</a>
-                  </td>
-                </tr>
-              </th:block>
-            </tbody>
-          </table>
+      <div class="staff-showtime-box mb-5 fade-up d4" th:if="${user != null && (user.role.name() == 'STAFF' || user.role.name() == 'ADMIN') && showtimesByRoom != null && !showtimesByRoom.isEmpty()}">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+          <h4 class="staff-header mb-0 text-warning">
+            <i class="bi bi-shield-lock-fill me-2"></i>Khu Vực Nghiệp Vụ Nhân Viên
+            <span>STAFF & ADMIN ONLY CONTROL PANEL</span>
+          </h4>
+          <span class="badge bg-warning-dim text-warning px-3 py-2" style="border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 20px;">
+            <i class="bi bi-shield-check me-1"></i>Đã xác thực quyền
+          </span>
+        </div>
+        
+        <div class="staff-card-grid">
+          <th:block th:each="entry : ${showtimesByRoom}">
+            <div th:each="showtime : ${entry.value}" class="staff-card">
+              <div class="staff-time-section">
+                <span class="staff-time" th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">09:00</span>
+                <span class="staff-time-label">Giờ Chiếu</span>
+              </div>
+              <div class="staff-room-section">
+                <div class="staff-room-icon">
+                  <i class="bi bi-door-open-fill"></i>
+                </div>
+                <div>
+                  <span class="staff-room-name" th:text="${entry.key.roomName}">Cinema Hall 1</span>
+                  <span class="staff-room-type">Tiêu chuẩn 2D</span>
+                </div>
+              </div>
+              <div class="staff-actions">
+                <a th:href="@{/staff/showtime/{id}/check-in(id=${showtime.id})}" class="btn-staff-action btn-staff-checkin">
+                  <i class="bi bi-qr-code-scan"></i> Check-in vé
+                </a>
+                <a th:href="@{/staff/showtime/{id}/walk-in(id=${showtime.id})}" class="btn-staff-action btn-staff-walkin">
+                  <i class="bi bi-person-plus-fill"></i> Bán vé Walk-in
+                </a>
+              </div>
+            </div>
+          </th:block>
         </div>
       </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer-cine">
       <div class="container">
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 2rem; flex-wrap: wrap;">
@@ -258,7 +422,6 @@
       </div>
     </footer>
 
-    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       const btnTrailer = document.querySelector('.btn-trailer');

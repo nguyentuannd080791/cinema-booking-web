@@ -1,6 +1,7 @@
 package com.springboot.cinema.repository;
 
 import com.springboot.cinema.entity.Movie;
+import com.springboot.cinema.entity.MovieStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +19,8 @@ public interface MovieRepository extends CrudRepository<Movie, Integer> {
     Page<Movie> findByCategoryName(@Param("movieName") String movieName,
                                    @Param("categoryName") String categoryName,
                                    Pageable pageable);
+
+    @Query("SELECT COUNT(m) FROM Movie m WHERE m.status = :status")
+    long countByStatus(@Param("status") MovieStatus status);
 
 }

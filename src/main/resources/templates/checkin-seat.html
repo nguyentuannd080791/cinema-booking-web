@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineMax - Check-In Vé (Nhân viên)</title>
-    <!-- Bootstrap CSS -->
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -27,7 +27,7 @@
     </style>
   </head>
   <body>
-    <!-- Staff Header Navbar -->
+
     <nav class="navbar-cinemax" style="border-bottom: 2px solid var(--warning, #ffc107) !important;">
       <div class="container d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
@@ -43,7 +43,7 @@
     </nav>
 
     <div class="container my-5">
-      <!-- Alerts -->
+
       <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-4" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>
         <span th:text="${success}">Thành công</span>
@@ -56,55 +56,50 @@
       </div>
 
       <div class="row g-4">
-        <!-- Main Seating Plan -->
+
         <div class="col-lg-8">
           <div class="card p-4 h-100 bg-transparent border-0">
             <h4 class="font-title mb-4 border-start border-warning border-4 ps-3 text-warning">Sơ Đồ Soát Vé Suất Chiếu</h4>
-            
+
             <div class="screen-container text-center mb-5">
               <div class="screen-visual" style="background: rgba(255, 215, 0, 0.1);">MÀN HÌNH CHIẾU</div>
             </div>
 
-            <!-- Seating matrix -->
             <div class="overflow-auto pb-3">
               <div class="seating-matrix" style="min-width: 600px;">
                 <div class="seat-row" th:each="entry : ${seatMap}">
                   <span class="seat-label" th:text="${entry.key}">A</span>
-                  
+
                   <th:block th:each="seat : ${entry.value}">
-                    <!-- Ghế chưa bán (Không có vé) -->
-                    <button th:if="${seat.ticketStatus == null}" 
-                            class="seat-btn disabled-staff" 
-                            disabled 
+
+                    <button th:if="${seat.ticketStatus == null}"
+                            class="seat-btn disabled-staff"
+                            disabled
                             th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">1</button>
-                            
-                    <!-- Vé đã check-in thành công (status == USED) -->
-                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'USED'}" 
-                            class="seat-btn checked-in" 
+
+                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'USED'}"
+                            class="seat-btn checked-in"
                             disabled><i class="bi bi-check-lg"></i></button>
-                            
-                    <!-- Vé cần check-in (status == VALID) -->
-                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'VALID'}" 
-                            class="seat-btn needs-checkin" 
+
+                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'VALID'}"
+                            class="seat-btn needs-checkin"
                             th:classappend="${seat.seatType.name() == 'COUPLE'} ? 'couple' : ''"
                             th:data-id="${seat.seatId}"
                             th:data-number="${seat.seatNumber}"
                             onclick="selectCheckinSeat(this)"
                             th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">6</button>
 
-                    <!-- Vé không hợp lệ (status == INVALID) -->
-                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'INVALID'}" 
-                            class="seat-btn sold" 
-                            disabled 
+                    <button th:if="${seat.ticketStatus != null && seat.ticketStatus.name() == 'INVALID'}"
+                            class="seat-btn sold"
+                            disabled
                             th:text="${seat.seatNumber.startsWith(entry.key) ? seat.seatNumber.substring(entry.key.length()) : seat.seatNumber}">X</button>
                   </th:block>
-                  
+
                   <span class="seat-label" th:text="${entry.key}">A</span>
                 </div>
               </div>
             </div>
 
-            <!-- Legend for Staff -->
             <div class="d-flex flex-wrap gap-4 mt-4 justify-content-center">
               <div class="d-flex align-items-center gap-2">
                 <div class="seat-btn disabled-staff" style="width: 24px; height: 24px; opacity: 0.2;"></div>
@@ -126,11 +121,10 @@
           </div>
         </div>
 
-        <!-- Sidebar Actions -->
         <div class="col-lg-4">
           <div class="staff-action-card">
             <h4 class="font-title mb-4 border-start border-warning border-4 ps-3 text-warning">Xử Lý Check-In</h4>
-            
+
             <div class="mb-3">
               <label class="text-white-50 d-block mb-1">Phim:</label>
               <h5 class="text-white font-title" th:text="${showtime.movie.title}">Avatar: Dòng Chảy Của Nước</h5>
@@ -165,7 +159,6 @@
       </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       let selectedCheckinSeats = [];
@@ -174,7 +167,7 @@
         btn.classList.toggle('selected');
         const seatId = btn.getAttribute('data-id');
         const seatNumber = btn.getAttribute('data-number');
-        
+
         if (btn.classList.contains('selected')) {
           selectedCheckinSeats.push({ id: seatId, number: seatNumber });
         } else {

@@ -1162,28 +1162,6 @@ input:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--text-primary) !important;
 }
 
-/* Auth (login/register) inputs — Bootstrap's .form-control:focus resets
-   background-color to white, turning these into a blank white box on
-   focus. Force the dark theme back on every state. */
-.auth-input,
-.auth-input.form-control {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: var(--text-primary) !important;
-}
-.auth-input::placeholder { color: var(--text-muted) !important; opacity: 1; }
-.auth-input:focus,
-.auth-input.form-control:focus {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px var(--accent-dim) !important;
-  color: var(--text-primary) !important;
-}
-.auth-input.is-invalid-custom,
-.auth-input.is-invalid-custom:focus {
-  border-color: var(--accent) !important;
-}
-
 /* ══════════════════════════════════════
    UTILS
 ══════════════════════════════════════ */
@@ -1285,7 +1263,6 @@ input:-webkit-autofill:focus {
   background-color: transparent !important;
   border-bottom: 1px solid var(--border) !important;
   font-size: 14px;
-  color: var(--text-primary) !important;
 }
 
 .admin-sidebar {
@@ -1333,10 +1310,6 @@ input:-webkit-autofill:focus {
   background-color: rgba(255,255,255,0.08) !important;
   border-color: var(--accent) !important;
   box-shadow: 0 0 0 3px var(--accent-glow) !important;
-}
-.form-cine-dark option {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
 /* Improved Seat UI */
@@ -1435,41 +1408,4 @@ input:-webkit-autofill:focus {
   align-items: center !important;
   gap: 8px !important;
   margin-bottom: 8px !important;
-}
-
-/* ══════════════════════════════════════
-   FLOATING INPUT DARK MODE FIX
-══════════════════════════════════════ */
-.form-floating > .form-control.auth-input {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #fff !important;
-}
-.form-floating > .form-control.auth-input:focus,
-.form-floating > .form-control.auth-input:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px var(--accent-glow) !important;
-  color: #fff !important;
-}
-.form-floating > label {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-.form-floating > label::after {
-  background-color: transparent !important;
-}
-.form-floating > .form-control.auth-input:focus ~ label,
-.form-floating > .form-control.auth-input:not(:placeholder-shown) ~ label {
-  color: var(--accent) !important;
-  background-color: transparent !important;
-}
-
-/* Browser WebKit Autofill Dark Overlay Fix */
-.auth-input:-webkit-autofill,
-.auth-input:-webkit-autofill:hover,
-.auth-input:-webkit-autofill:focus,
-.auth-input:-webkit-autofill:active {
-  -webkit-text-fill-color: #fff !important;
-  -webkit-box-shadow: 0 0 0px 1000px #141414 inset !important;
-  transition: background-color 5000s ease-in-out 0s;
 }

@@ -5,11 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/**
- * Runs periodically to release seats held by "PENDING" bookings whose showtime has already
- * started (khách chưa thanh toán kịp trước giờ chiếu). Not a short 5-10 minute reservation
- * timeout — just a safeguard so seats aren't locked forever past a showtime that already happened.
- */
 @Component
 public class ExpiredBookingCleanupJob {
 

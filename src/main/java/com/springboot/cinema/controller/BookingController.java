@@ -29,10 +29,6 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    /**
-     * Chỉ đọc: không tạo Booking/Ticket ở đây. Quyết định hiển thị màn "Xác nhận giữ ghế"
-     * (chưa có bookingId) hay màn "thanh toán" (đã có bookingId).
-     */
     @GetMapping("/confirm-booking")
     public String displayBooking(Model model,
                                  HttpSession session,
@@ -60,7 +56,7 @@ public class BookingController {
 
         Integer bookingId = (Integer) session.getAttribute("bookingId");
         if (bookingId == null) {
-            // Màn "Xác nhận giữ ghế": chỉ tóm tắt ghế/giá, chưa ghi dữ liệu gì.
+
             List<SeatListDTO> customerSeatList = seatService.getCustomerSeatList(showtimeId, selectedSeatIds);
             Double totalPrice = seatService.caculateTotalPrice(showtimeId, selectedSeatIds);
 
@@ -70,7 +66,6 @@ public class BookingController {
             return "confirm-booking";
         }
 
-        // Đã có bookingId: hiển thị màn thanh toán.
         Booking booking = bookingService.getBookingById(bookingId);
         if (booking == null) {
             session.removeAttribute("bookingId");
@@ -84,10 +79,6 @@ public class BookingController {
         return "confirm-booking";
     }
 
-    /**
-     * Điểm ghi dữ liệu thay cho POST /confirm-booking trước đây: tạo Booking khi người dùng
-     * vừa đăng nhập xong (đã có lựa chọn ghế trong session nhưng chưa có bookingId).
-     */
     @PostMapping("/confirm-booking/create")
     public String createBooking(HttpSession session,
                                 RedirectAttributes redirectAttributes) {
@@ -105,7 +96,7 @@ public class BookingController {
         }
 
         if (session.getAttribute("bookingId") != null) {
-            // Đã có booking rồi (ví dụ do F5/double click) — không tạo trùng, chỉ hiển thị lại màn thanh toán.
+
             return "redirect:/confirm-booking";
         }
 
@@ -126,10 +117,6 @@ public class BookingController {
         }
     }
 
-    /**
-     * Trang "Đơn đặt vé của tôi": liệt kê toàn bộ đơn (đang chờ/đã thanh toán/đã huỷ) của
-     * người dùng đang đăng nhập, mới nhất trước. Chỉ đọc, không thao tác lên session đặt vé hiện tại.
-     */
     @GetMapping("/my-bookings")
     public String myBookings(Model model, HttpSession session) {
         UserInformationDTO user = (UserInformationDTO) session.getAttribute("user");

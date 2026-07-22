@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineMax Admin - Quản lý Lịch chiếu</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" th:href="@{/style.css}" />
+  </head>
+  <body>
+
+    <nav class="navbar-cinemax">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <a class="nav-brand me-4" th:href="@{/home}">
+            <i class="bi bi-film text-danger"></i>CINE<span>MAX</span>
+          </a>
+          <span class="badge bg-warning text-dark font-title px-2 py-1 fs-6">ADMIN PORTAL</span>
+        </div>
+        <div class="nav-actions">
+          <a th:href="@{/home}" class="btn-nav-ghost"><i class="bi bi-box-arrow-left me-1"></i>Thoát</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+
+        <div class="col-md-3 col-lg-2 admin-sidebar">
+          <div class="py-4">
+            <a th:href="@{/admin/dashboard}" class="sidebar-link">
+              <i class="bi bi-speedometer2"></i> Tổng quan
+            </a>
+            <a th:href="@{/admin/movies}" class="sidebar-link">
+              <i class="bi bi-film"></i> Quản lý Phim
+            </a>
+            <a th:href="@{/admin/rooms}" class="sidebar-link">
+              <i class="bi bi-door-open"></i> Quản lý Phòng
+            </a>
+            <a th:href="@{/admin/seats}" class="sidebar-link">
+              <i class="bi bi-grid-3x3"></i> Quản lý Ghế
+            </a>
+            <a th:href="@{/admin/showtimes}" class="sidebar-link active">
+              <i class="bi bi-calendar-event"></i> Quản lý Lịch chiếu
+            </a>
+          </div>
+        </div>
+
+        <div class="col-md-9 col-lg-10 p-4">
+
+          <div th:if="${success}" class="alert alert-success alert-dismissible fade show bg-dark border-success text-success mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${success}">Thành công</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show bg-dark border-danger text-danger mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}">Lỗi</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h2 class="font-title mb-0 border-start border-danger border-4 ps-3 text-white">Quản Lý Lịch Chiếu</h2>
+            <button class="btn btn-danger px-4" data-bs-toggle="modal" data-bs-target="#addShowtimeModal" th:disabled="${selectedMovieId == null}">
+              <i class="bi bi-plus-lg me-1"></i> Thêm suất chiếu mới
+            </button>
+          </div>
+
+          <div class="admin-card mb-4 py-3">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-6">
+                <label class="text-white-50 form-label mb-1">Chọn phim:</label>
+                <select class="form-select form-cine-dark text-white" id="movieSelector" onchange="window.location.href='/admin/showtimes?movieId=' + this.value">
+                  <option th:each="movie : ${movies}"
+                          th:value="${movie.id}"
+                          th:text="${movie.title}"
+                          th:selected="${movie.id == selectedMovieId}"></option>
+                </select>
+              </div>
+              <div class="col-md-6" th:if="${selectedMovie != null}">
+                <div class="text-white-50">
+                  Thời lượng phim: <strong class="text-white" th:text="${selectedMovie.duration} + ' phút'">120 phút</strong>
+                  (giờ kết thúc suất chiếu tự động tính từ thời lượng này, luôn chừa tối thiểu 15 phút dọn phòng trước/sau suất khác)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-card" th:if="${selectedMovieId != null}">
+            <div class="table-responsive">
+              <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Giờ bắt đầu</th>
+                    <th>Giờ kết thúc</th>
+                    <th>Phòng chiếu</th>
+                    <th>Giá vé</th>
+                    <th>Trạng thái</th>
+                    <th>Vé đã bán</th>
+                    <th class="text-end">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="showtime : ${showtimes}">
+                    <td th:text="${#temporals.format(showtime.startTime, 'dd/MM/yyyy HH:mm')}">01/01/2026 19:00</td>
+                    <td th:text="${#temporals.format(showtime.endTime, 'dd/MM/yyyy HH:mm')}">01/01/2026 21:00</td>
+                    <td th:text="${showtime.room.roomName}">Cinema Hall 1</td>
+                    <td th:text="${showtime.price} + ' đ'">90000 đ</td>
+                    <td>
+                      <span class="badge bg-success" th:if="${openByShowtimeId.get(showtime.id)}">Đã mở bán</span>
+                      <span class="badge bg-secondary" th:unless="${openByShowtimeId.get(showtime.id)}">Chưa mở bán</span>
+                      <span class="badge bg-dark border border-secondary text-white-50 ms-1" th:if="${pastByShowtimeId.get(showtime.id)}">Đã qua giờ chiếu</span>
+                    </td>
+                    <td>
+                      <span class="badge"
+                            th:classappend="${soldTicketsByShowtimeId.get(showtime.id) > 0} ? 'bg-warning text-dark' : 'bg-secondary'"
+                            th:text="${soldTicketsByShowtimeId.get(showtime.id)}">0</span>
+                    </td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-success btn-sm me-1" data-bs-toggle="modal" th:data-bs-target="'#openShowtimeModal-' + ${showtime.id}"
+                              th:if="${!editLockedByShowtimeId.get(showtime.id)}">
+                        <i class="bi bi-broadcast me-1"></i>Mở bán
+                      </button>
+                      <button class="btn btn-outline-warning btn-sm me-1" data-bs-toggle="modal" th:data-bs-target="'#editShowtimeModal-' + ${showtime.id}"
+                              th:if="${!editLockedByShowtimeId.get(showtime.id)}">
+                        <i class="bi bi-pencil-fill me-1"></i>Sửa
+                      </button>
+                      <button class="btn btn-outline-warning btn-sm me-1" disabled
+                              th:if="${editLockedByShowtimeId.get(showtime.id)}"
+                              th:title="${openByShowtimeId.get(showtime.id)} ? 'Suất chiếu đã mở bán, không thể chỉnh sửa' : 'Suất chiếu đã qua giờ chiếu, không thể chỉnh sửa'">
+                        <i class="bi bi-pencil-fill me-1"></i>Sửa
+                      </button>
+                      <form th:action="@{/admin/showtimes/{id}/delete(id=${showtime.id})}" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa suất chiếu này không?');">
+                        <input type="hidden" name="movieId" th:value="${selectedMovieId}" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                th:disabled="${deleteLockedByShowtimeId.get(showtime.id)}"
+                                th:title="${openByShowtimeId.get(showtime.id)} ? 'Suất chiếu đã mở bán, không thể xoá' : (${soldTicketsByShowtimeId.get(showtime.id) > 0} ? 'Không thể xóa suất chiếu đã có vé được đặt/giữ chỗ' : '')">
+                          <i class="bi bi-trash-fill"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <tr th:if="${showtimes == null || showtimes.isEmpty()}">
+                    <td colspan="7" class="text-center text-white-50 py-4">Chưa có suất chiếu nào cho phim này.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-card text-center text-white-50 py-4" th:if="${selectedMovieId == null}">
+            Chưa có phim nào trong hệ thống để tạo suất chiếu.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="addShowtimeModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title font-title"><i class="bi bi-plus-circle-fill me-2 text-danger"></i>Thêm Suất Chiếu Mới</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form th:action="@{/admin/showtimes}" method="post">
+            <div class="modal-body d-flex flex-column gap-3">
+              <div class="alert alert-info bg-dark border-info text-info mb-0 py-2">
+                <i class="bi bi-info-circle-fill me-1"></i>
+                Suất chiếu mới sẽ ở trạng thái <strong>Chưa mở bán</strong> — khách hàng chỉ thấy và đặt được vé sau khi bạn bấm "Mở bán".
+              </div>
+              <div>
+                <label class="form-label text-white-50">Phim</label>
+                <select class="form-select form-cine-dark text-white" name="movieId" required>
+                  <option th:each="movie : ${movies}"
+                          th:value="${movie.id}"
+                          th:text="${movie.title}"
+                          th:selected="${movie.id == selectedMovieId}"></option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label text-white-50">Phòng chiếu</label>
+                <select class="form-select form-cine-dark text-white" name="roomId" required>
+                  <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.roomName}"></option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label text-white-50">Giờ bắt đầu</label>
+                <input type="datetime-local" class="form-control form-cine-dark text-white" name="startTime" required />
+                <small class="text-white-50">Giờ kết thúc tự động tính từ thời lượng phim; cần cách suất chiếu khác trong cùng phòng tối thiểu 15 phút.</small>
+              </div>
+              <div>
+                <label class="form-label text-white-50">Giá vé (đ)</label>
+                <input type="number" step="0.01" min="0" class="form-control form-cine-dark text-white" name="price" required placeholder="90000" />
+              </div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-danger px-4 font-title text-white">Tạo Suất Chiếu</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div th:each="showtime : ${showtimes}" th:if="${!editLockedByShowtimeId.get(showtime.id)}" class="modal fade" th:id="'editShowtimeModal-' + ${showtime.id}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title font-title"><i class="bi bi-pencil-square me-2 text-warning"></i>Sửa Suất Chiếu</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form th:action="@{/admin/showtimes}" method="post">
+            <input type="hidden" name="id" th:value="${showtime.id}" />
+            <input type="hidden" name="movieId" th:value="${selectedMovieId}" />
+            <div class="modal-body d-flex flex-column gap-3">
+              <div>
+                <label class="form-label text-white-50">Phòng chiếu</label>
+                <select class="form-select form-cine-dark text-white" name="roomId" required>
+                  <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.roomName}" th:selected="${room.id == showtime.room.id}"></option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label text-white-50">Giờ bắt đầu</label>
+                <input type="datetime-local" class="form-control form-cine-dark text-white" name="startTime"
+                       th:value="${#temporals.format(showtime.startTime, 'yyyy-MM-dd''T''HH:mm')}" required />
+              </div>
+              <div>
+                <label class="form-label text-white-50">Giá vé (đ)</label>
+                <input type="number" step="0.01" min="0" class="form-control form-cine-dark text-white" name="price" th:value="${showtime.price}" required />
+              </div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-warning px-4 text-dark font-title">Cập Nhật</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div th:each="showtime : ${showtimes}" th:if="${!editLockedByShowtimeId.get(showtime.id)}" class="modal fade" th:id="'openShowtimeModal-' + ${showtime.id}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title font-title"><i class="bi bi-broadcast me-2 text-success"></i>Mở Bán Suất Chiếu</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form th:action="@{/admin/showtimes/{id}/open(id=${showtime.id})}" method="post">
+            <input type="hidden" name="movieId" th:value="${selectedMovieId}" />
+            <div class="modal-body">
+              <p>
+                Mở bán suất chiếu lúc
+                <strong th:text="${#temporals.format(showtime.startTime, 'dd/MM/yyyy HH:mm')}">01/01/2026 19:00</strong>
+                tại <strong th:text="${showtime.room.roomName}">Cinema Hall 1</strong>?
+              </p>
+              <div class="alert alert-warning bg-dark border-warning text-warning mb-0">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                Sau khi mở bán, suất chiếu <strong>không thể chỉnh sửa hoặc xoá</strong> nữa để đảm bảo tính nhất quán với vé đã bán.
+              </div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-success px-4 font-title text-white">Xác Nhận Mở Bán</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

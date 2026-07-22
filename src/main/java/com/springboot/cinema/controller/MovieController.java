@@ -50,7 +50,7 @@ public class MovieController {
             try {
                 selectedDate = LocalDate.parse(rawDate);
             } catch (Exception e) {
-                // Ignore parse errors
+
             }
         }
 

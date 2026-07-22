@@ -37,8 +37,7 @@ public class PaymentController {
         }
 
         try {
-            // Sở hữu (theo userId) là cần nhưng chưa đủ — đã kiểm tra thêm ở trên rằng transactionReference
-            // khớp đúng booking đang mở trong session, tránh xác nhận/huỷ nhầm một đơn cũ khác của cùng user.
+
             paymentService.confirmPayment(transactionReference, user.getUserId());
 
             clearBookingSession(session);
@@ -82,12 +81,6 @@ public class PaymentController {
         }
     }
 
-    /**
-     * Đảm bảo transactionReference gửi lên khớp đúng booking đang mở trong session (không chỉ là
-     * một giao dịch bất kỳ thuộc về user). Nếu không có booking đang mở, hoặc booking đó không có
-     * payment với transactionReference tương ứng, coi như không hợp lệ — trả về đường dẫn redirect
-     * để controller dừng xử lý ngay; trả về null nếu hợp lệ.
-     */
     private String requireMatchesSessionBooking(String transactionReference, HttpSession session, RedirectAttributes redirectAttributes) {
         Integer sessionBookingId = (Integer) session.getAttribute("bookingId");
         if (sessionBookingId == null) {

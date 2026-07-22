@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-
 public interface MovieService {
     Page<Movie> getMovieList(String movieName, String categoryName, int page, int size);
 
@@ -13,7 +12,7 @@ public interface MovieService {
 
     List<Movie> getAllMovies();
 
-    Movie saveMovie(Movie movie);
+    Movie saveMovie(Movie movie, List<Integer> categoryIds);
 
     void deleteMovie(int movieId);
 }
